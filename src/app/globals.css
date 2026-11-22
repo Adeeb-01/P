@@ -1,0 +1,217 @@
+@import "tailwindcss" source(none);
+@source "../";
+
+/* Pointer-precise hover, mirrors `@media (hover: hover) and (pointer: fine)` from the original CSS. */
+@custom-variant hover-fine (@media (hover: hover) and (pointer: fine));
+/* Theme polarity: set on <html data-theme="light|dark"> by the pre-paint script / ThemeToggle. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* ── Theme-aware semantic colours (light defaults, dark overrides) ── */
+:root {
+  --theme-canvas: rgb(255, 255, 255);
+  --theme-surface: rgb(247, 247, 247);
+  --theme-surface-hover: rgb(243, 243, 243);
+  --theme-elevated: rgb(255, 255, 255);
+  --theme-fg: rgb(17, 17, 17);
+  --theme-fg-soft: rgb(31, 31, 31);
+  --theme-muted: rgb(108, 113, 121);
+  --theme-slate: rgb(113, 118, 127);
+  --theme-line: rgb(209, 211, 214);
+  --theme-ink: rgb(17, 17, 17);
+  --theme-inverse: rgb(17, 17, 17);
+  --theme-on-inverse: rgb(255, 255, 255);
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --theme-canvas: rgb(10, 10, 11);
+  --theme-surface: rgb(20, 20, 22);
+  --theme-surface-hover: rgb(26, 26, 29);
+  --theme-elevated: rgb(28, 28, 31);
+  --theme-fg: rgb(242, 242, 243);
+  --theme-fg-soft: rgb(214, 215, 218);
+  --theme-muted: rgb(154, 160, 168);
+  --theme-slate: rgb(143, 149, 158);
+  --theme-line: rgb(58, 59, 64);
+  --theme-ink: rgb(20, 20, 22);
+  --theme-inverse: rgb(242, 242, 243);
+  --theme-on-inverse: rgb(10, 10, 11);
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-canvas: var(--theme-canvas);
+  --color-surface: var(--theme-surface);
+  --color-surface-hover: var(--theme-surface-hover);
+  --color-elevated: var(--theme-elevated);
+  --color-fg: var(--theme-fg);
+  --color-fg-soft: var(--theme-fg-soft);
+  --color-muted: var(--theme-muted);
+  --color-slate: var(--theme-slate);
+  --color-line: var(--theme-line);
+  --color-ink: var(--theme-ink);
+  --color-inverse: var(--theme-inverse);
+  --color-on-inverse: var(--theme-on-inverse);
+}
+
+@theme {
+  /* ── Typeface ─────────────────────────────────────────────── */
+  --font-sans: var(--font-instrument-sans), "Instrument Sans", sans-serif;
+
+  /* ── Breakpoints (exact px from the original media queries) ─ */
+  --breakpoint-*: initial;
+  --breakpoint-xs: 540px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 810px;
+  --breakpoint-tab: 901px;
+  --breakpoint-xl: 1200px;
+
+  /* ── Colour palette ───────────────────────────────────────── */
+  --color-graphite: rgb(31, 31, 31);
+  --color-light: rgb(247, 247, 247);
+  --color-violet: rgb(116, 48, 247);
+  --color-purple: rgb(112, 37, 255);
+  --color-green: rgb(0, 192, 71);
+  --color-yellow: rgb(239, 206, 3);
+  --color-gold: rgb(255, 204, 0);
+  --color-focus: oklch(0.66 0.18 255);
+  --color-danger: rgb(255, 107, 107);
+  --color-tile-yellow: rgb(254, 254, 232);
+  --color-tile-purple: rgb(245, 242, 255);
+  --color-tile-green: rgb(238, 255, 243);
+
+  /* ── Type scale: size / line-height / letter-spacing ─────── */
+  --text-display: 40px;
+  --text-display--line-height: 44px;
+  --text-display--letter-spacing: -1.2px;
+  --text-section: 36px;
+  --text-section--line-height: 43.2px;
+  --text-section--letter-spacing: -1.44px;
+  --text-card: 22px;
+  --text-card--line-height: 28.6px;
+  --text-card--letter-spacing: -0.66px;
+  --text-brand: 20px;
+  --text-brand--line-height: 26px;
+  --text-brand--letter-spacing: -0.6px;
+  --text-eyebrow: 18px;
+  --text-eyebrow--line-height: 23.4px;
+  --text-eyebrow--letter-spacing: -0.54px;
+  --text-body: 16px;
+  --text-body--line-height: 22.4px;
+  --text-body--letter-spacing: -0.48px;
+  --text-btn: 16px;
+  --text-btn--line-height: 20.8px;
+  --text-btn--letter-spacing: -0.48px;
+  --text-btn-sm: 15px;
+  --text-btn-sm--line-height: 19.5px;
+  --text-btn-sm--letter-spacing: -0.45px;
+  --text-small: 15px;
+  --text-small--line-height: 21px;
+  --text-small--letter-spacing: -0.45px;
+  --text-credit: 14px;
+  --text-credit--line-height: 19.6px;
+  --text-credit--letter-spacing: -0.42px;
+
+  /* ── Radii ────────────────────────────────────────────────── */
+  --radius-5xl: 40px;
+
+  /* ── Shadows ──────────────────────────────────────────────── */
+  --shadow-button: 0.474px 0.474px 0.671px -0.2px rgba(0, 0, 0, 0.05), 1.291px 1.291px 1.826px -0.4px rgba(0, 0, 0, 0.06), 2.836px 2.836px 4.01px -0.6px rgba(0, 0, 0, 0.08), 6.294px 6.294px 8.901px -0.8px rgba(0, 0, 0, 0.11), 16px 16px 22.627px -1px rgba(0, 0, 0, 0.2);
+  --shadow-button-sm: 0 2px 8px rgba(0, 0, 0, 0.09);
+  --shadow-violet: 0 8px 20px -8px rgba(80, 36, 168, 0.24);
+  --shadow-form: 0.672px 0.672px 0.95px -0.125px rgba(0, 0, 0, 0.05), 1.592px 1.592px 2.252px -0.25px rgba(0, 0, 0, 0.06), 2.905px 2.905px 4.108px -0.375px rgba(0, 0, 0, 0.06), 4.829px 4.829px 6.829px -0.5px rgba(0, 0, 0, 0.07), 7.798px 7.798px 11.029px -0.625px rgba(0, 0, 0, 0.08), 12.765px 12.765px 18.053px -0.75px rgba(0, 0, 0, 0.1), 21.981px 21.981px 31.086px -0.875px rgba(0, 0, 0, 0.13), 40px 40px 56.569px -1px rgba(0, 0, 0, 0.2);
+  --shadow-service: 0 1px 2px rgba(17, 17, 17, 0.03), 0 16px 34px -28px rgba(17, 17, 17, 0.22);
+  --shadow-service-hover: 0 2px 4px rgba(17, 17, 17, 0.04), 0 20px 38px -28px rgba(17, 17, 17, 0.28);
+  --shadow-prominent: 0.67px 0.67px 0.95px -0.125px rgba(0, 0, 0, 0.05), 1.59px 1.59px 2.25px -0.25px rgba(0, 0, 0, 0.06), 2.9px 2.9px 4.1px -0.375px rgba(0, 0, 0, 0.06), 4.83px 4.83px 6.83px -0.5px rgba(0, 0, 0, 0.07), 7.8px 7.8px 11px -0.625px rgba(0, 0, 0, 0.08), 12.77px 12.77px 18px -0.75px rgba(0, 0, 0, 0.1), 21.98px 21.98px 31px -0.875px rgba(0, 0, 0, 0.13), 40px 40px 56px -1px rgba(0, 0, 0, 0.2);
+  --shadow-prominent-hover: 0.67px 0.67px 0.95px -0.125px rgba(0, 0, 0, 0.05), 1.59px 1.59px 2.25px -0.25px rgba(0, 0, 0, 0.06), 2.9px 2.9px 4.1px -0.375px rgba(0, 0, 0, 0.06), 4.83px 4.83px 6.83px -0.5px rgba(0, 0, 0, 0.07), 7.8px 7.8px 11px -0.625px rgba(0, 0, 0, 0.08), 12.77px 12.77px 18px -0.75px rgba(0, 0, 0, 0.1), 21.98px 21.98px 31px -0.875px rgba(0, 0, 0, 0.14), 42px 42px 60px -1px rgba(0, 0, 0, 0.22);
+  --shadow-testimonial: 0 20px 36px -18px rgba(0, 0, 0, 0.26);
+  --shadow-stat: 0 5px 9px -6px rgba(0, 0, 0, 0.12);
+  --shadow-trusted: 0 5px 12px -8px rgba(0, 0, 0, 0.2);
+  --shadow-award-icon: 0 4px 14px rgba(0, 0, 0, 0.08);
+  --shadow-faq-shell: 0 8px 24px -24px rgba(0, 0, 0, 0.1);
+  --shadow-pill: 0 5px 14px -12px rgba(0, 0, 0, 0.22);
+  --shadow-closing: 0 8px 22px -12px rgba(0, 0, 0, 0.42);
+  --shadow-closing-hover: 0 10px 26px -12px rgba(0, 0, 0, 0.5);
+  --shadow-menu: 0 10px 28px -24px rgba(0, 0, 0, 0.26);
+  --shadow-badge: 0 1px 2px -1px rgba(0, 0, 0, 0.17), 0 2px 6px -3px rgba(0, 0, 0, 0.14), 0 10px 26px -4px rgba(0, 0, 0, 0.02);
+
+  /* ── Easing ───────────────────────────────────────────────── */
+  --ease-luzia: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-framer: cubic-bezier(0.44, 0, 0.56, 1);
+
+  /* ── Animations ───────────────────────────────────────────── */
+  --animate-object-turn: object-turn 20s linear infinite;
+  --animate-route-enter: route-enter 620ms cubic-bezier(0.22, 1, 0.36, 1) 24ms both;
+
+  @keyframes object-turn {
+    to { transform: rotate(-360deg); }
+  }
+  --animate-eq: eq-bar 900ms ease-in-out infinite;
+
+  @keyframes eq-bar {
+    0%, 100% { transform: scaleY(0.35); }
+    50% { transform: scaleY(1); }
+  }
+  @keyframes route-enter {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+}
+
+@layer base {
+  html {
+    /* The original pages relied on the UA default; Preflight's 1.5 inflates inline line boxes. */
+    line-height: normal;
+    overflow-y: scroll;
+    background: var(--color-canvas);
+  }
+
+  body {
+    min-width: 320px;
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: geometricPrecision;
+  }
+
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    outline: 3px solid var(--color-focus);
+    outline-offset: 3px;
+  }
+
+  /* Global CustomCursor replaces the native pointer (fine pointers only); text fields keep their caret. */
+  html.has-custom-cursor,
+  html.has-custom-cursor * {
+    cursor: none !important;
+  }
+  html.has-custom-cursor :is(input, textarea, select, [contenteditable="true"]) {
+    cursor: text !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      scroll-behavior: auto !important;
+      animation-duration: 0.01ms !important;
+      animation-delay: 0ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* Theme switch: the View Transitions API snapshots the page; the new theme is revealed by a
+   clip-path circle animated from JS (ThemeToggle). Default cross-fade is disabled. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
+}

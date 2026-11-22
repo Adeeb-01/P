@@ -1,0 +1,12 @@
+node_modules/
+.DS_Store
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+.env*.local
+.env
+
+# Local tooling (not part of the app)
+.od-skills/
+%SystemDrive%/
