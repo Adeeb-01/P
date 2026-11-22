@@ -4,7 +4,7 @@ import { ScrambleText } from "@/components/motion/ScrambleText";
 
 export function FaqSection() {
   return (
-    <section aria-labelledby="faq-title" className="w-full bg-canvas pt-14 pb-40 max-xl:py-[200px] max-md:pt-[100px]">
+    <section aria-labelledby="faq-title" data-telemetry="06 FAQ" className="w-full bg-canvas pt-14 pb-40 max-xl:py-[200px] max-md:pt-[100px]">
       <div className="mx-auto grid w-[min(1128px,calc(100%-80px))] grid-cols-[minmax(0,532px)_minmax(0,548px)] items-start gap-12 max-xl:grid-cols-1 max-xl:gap-[60px] max-md:w-[calc(100%-40px)]">
         <div className="pt-5 max-xl:pt-0">
           <p className="m-0 flex items-center gap-4 text-btn font-medium text-muted after:h-px after:flex-auto after:bg-[rgb(231,232,233)] after:content-['']">

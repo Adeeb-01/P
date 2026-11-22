@@ -56,6 +56,7 @@ export default async function CaseStudyPage({ params }: Params) {
             <QuickJumpTrigger className="max-md:hidden" />
           </div>
 
+          <div data-telemetry="01 Overview">
           {/* Hero */}
           <Reveal>
             <p className="m-0 mb-6 inline-flex items-center gap-2 rounded-full border border-dashed border-violet/40 bg-violet/10 px-3 py-1.5 text-[13px] leading-none font-medium text-violet">
@@ -84,9 +85,10 @@ export default async function CaseStudyPage({ params }: Params) {
               <img src={project.image.src} alt={project.image.alt} width={project.image.width} height={project.image.height} className="absolute inset-0 h-full w-full object-cover" />
             </div>
           </ClipReveal>
+          </div>
 
           {/* Challenge */}
-          <section className="mt-[140px] grid grid-cols-[40%_60%] items-start max-xl:grid-cols-1 max-xl:gap-6 max-md:mt-24">
+          <section data-telemetry="02 Challenge" className="mt-[140px] grid grid-cols-[40%_60%] items-start max-xl:grid-cols-1 max-xl:gap-6 max-md:mt-24">
             <SectionLabel>The challenge</SectionLabel>
             <Reveal>
               <p className="m-0 text-section font-medium text-balance text-fg max-tab:text-[28px] max-tab:leading-[1.25]">{study.challenge}</p>
@@ -94,7 +96,7 @@ export default async function CaseStudyPage({ params }: Params) {
           </section>
 
           {/* Approach */}
-          <section className="mt-[120px] grid grid-cols-[40%_60%] items-start max-xl:grid-cols-1 max-xl:gap-6 max-md:mt-20">
+          <section data-telemetry="03 Approach" className="mt-[120px] grid grid-cols-[40%_60%] items-start max-xl:grid-cols-1 max-xl:gap-6 max-md:mt-20">
             <SectionLabel>Approach</SectionLabel>
             <ol className="m-0 grid list-none gap-3 p-0">
               {study.approach.map((step, index) => (
@@ -107,7 +109,7 @@ export default async function CaseStudyPage({ params }: Params) {
           </section>
 
           {/* Metrics (placeholders) */}
-          <section className="mt-[120px] max-md:mt-20" aria-labelledby="metrics-title">
+          <section data-telemetry="04 Impact" className="mt-[120px] max-md:mt-20" aria-labelledby="metrics-title">
             <div className="mb-8 flex items-baseline justify-between gap-4">
               <h2 id="metrics-title" className="m-0 text-eyebrow font-normal text-slate">
                 Impact
@@ -147,11 +149,11 @@ export default async function CaseStudyPage({ params }: Params) {
           </section>
         </div>
 
-        <div className="pl-[max(40px,calc((100%-1120px)/2))] max-md:pl-5">
+        <div data-telemetry="05 Details" className="pl-[max(40px,calc((100%-1120px)/2))] max-md:pl-5">
           <Gallery image={project.image} crops={study.gallery} title={project.title} controlsClassName="pr-[max(40px,calc((100%-1120px)/2))] max-md:pr-5" />
         </div>
 
-        <div className="mx-auto mt-[140px] w-[min(1120px,calc(100%-80px))] max-md:mt-24 max-md:w-[calc(100%-40px)]">
+        <div data-telemetry="06 Next" className="mx-auto mt-[140px] w-[min(1120px,calc(100%-80px))] max-md:mt-24 max-md:w-[calc(100%-40px)]">
           <NextProject project={next} />
         </div>
       </main>

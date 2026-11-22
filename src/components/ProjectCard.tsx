@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import type { PointerEvent } from "react";
+import { useRef, type PointerEvent } from "react";
 import { m, useMotionValue, useSpring, useTransform } from "motion/react";
 import clsx from "clsx";
 import { SPRING_SNAPPY, useCachedRect, usePointerEffects } from "@/components/motion/hooks";
 import { projectHref, type Project } from "@/lib/projects";
 import { ScrambleText } from "@/components/motion/ScrambleText";
+import { WebGLImagePlane } from "@/components/fx/WebGLImagePlane";
 
 const MAX_TILT = 4;
 const MotionLink = m.create(Link);
@@ -23,6 +24,7 @@ export function ProjectCard({ project, variant }: { project: Project; variant: "
   const image = featured ? project.featuredImage : project.image;
   const Title = featured ? "h3" : "span";
   const enabled = usePointerEffects();
+  const hostRef = useRef<HTMLAnchorElement>(null);
 
   const px = useMotionValue(0);
   const py = useMotionValue(0);
@@ -47,6 +49,7 @@ export function ProjectCard({ project, variant }: { project: Project; variant: "
 
   return (
     <MotionLink
+      ref={hostRef}
       id={featured ? `project-${project.slug}` : undefined}
       href={projectHref(project.slug)}
       aria-label={`View ${project.title} case study`}
@@ -66,18 +69,24 @@ export function ProjectCard({ project, variant }: { project: Project; variant: "
           !featured && "transition-[inset] duration-[400ms] ease-framer group-focus-visible:inset-0 hover-fine:group-hover:inset-0",
         )}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element -- overscanned cover image needs exact box sizing */}
-        <img
-          src={image.src}
-          width={image.width}
-          height={image.height}
-          alt={image.alt}
+        <span
           className={clsx(
-            "block h-full w-full object-cover",
+            "relative block h-full w-full",
             featured &&
-              "origin-center object-center transition-transform duration-[560ms] ease-luzia group-focus-visible:[transform:scale(1.03)] group-focus-visible:will-change-transform hover-fine:group-hover:[transform:scale(1.03)] hover-fine:group-hover:will-change-transform motion-reduce:transition-none motion-reduce:group-hover:transform-none! motion-reduce:group-focus-visible:transform-none!",
+              "origin-center transition-transform duration-[560ms] ease-luzia group-focus-visible:[transform:scale(1.03)] group-focus-visible:will-change-transform hover-fine:group-hover:[transform:scale(1.03)] hover-fine:group-hover:will-change-transform motion-reduce:transition-none motion-reduce:group-hover:transform-none! motion-reduce:group-focus-visible:transform-none!",
           )}
-        />
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element -- overscanned cover image needs exact box sizing */}
+          <img
+            src={image.src}
+            width={image.width}
+            height={image.height}
+            alt={image.alt}
+            className="block h-full w-full object-cover object-center"
+          />
+          {/* Liquid ripple + chromatic aberration (shared WebGL context, active only while moving). */}
+          <WebGLImagePlane src={image.src} hostRef={hostRef} />
+        </span>
       </span>
 
       <span

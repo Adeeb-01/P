@@ -7,7 +7,7 @@ import { ScrambleText } from "@/components/motion/ScrambleText";
 
 export function FeaturedWorks() {
   return (
-    <main id="projects" className="flex w-full scroll-mt-20 justify-center bg-canvas pt-[120px] pb-[200px] max-md:pt-20 max-md:pb-[100px]">
+    <main id="projects" data-telemetry="02 Works" className="flex w-full scroll-mt-20 justify-center bg-canvas pt-[120px] pb-[200px] max-md:pt-20 max-md:pb-[100px]">
       <div className="flex w-[min(1120px,calc(100%-80px))] flex-col gap-10 max-md:w-[calc(100%-40px)]">
         <div className="flex min-h-12 items-center justify-between">
           <h2 className="m-0 text-section font-medium text-fg"><ScrambleText self text="Featured works" /></h2>

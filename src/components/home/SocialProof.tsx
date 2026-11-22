@@ -17,7 +17,7 @@ function ArrowUpRight({ className }: { className?: string }) {
 
 export function SocialProof() {
   return (
-    <section aria-label="Social proof and client trust" className="flex w-full justify-center bg-canvas pb-[200px] max-md:py-[100px]">
+    <section aria-label="Social proof and client trust" data-telemetry="03 Proof" className="flex w-full justify-center bg-canvas pb-[200px] max-md:py-[100px]">
       <Reveal className="grid w-[min(1128px,calc(100%-80px))] grid-cols-[minmax(0,32fr)_minmax(0,38fr)_minmax(0,30fr)] items-start gap-3 max-md:w-[calc(100%-40px)] max-md:grid-cols-1">
         {/* Awwwards */}
         <SpotlightCard className={clsx(card, "bg-surface p-6")}>

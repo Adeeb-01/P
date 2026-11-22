@@ -11,6 +11,9 @@ import { SpatialDock } from "@/components/dock/SpatialDock";
 import { SoundEngine } from "@/components/sound/SoundEngine";
 import { QuickJumpPalette } from "@/components/works/ProjectQuickJump";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
+import { PRELOADER_INIT_SCRIPT } from "@/lib/preloader";
+import { Preloader } from "@/components/transition/Preloader";
+import { ScrollTelemetry } from "@/components/telemetry/ScrollTelemetry";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -38,11 +41,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en" suppressHydrationWarning className={`${instrumentSans.variable} max-tab:overflow-y-auto`}>
       <head>
         {/* Sets data-theme before first paint (stored choice → OS preference): no theme flash. */}
-        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT + PRELOADER_INIT_SCRIPT }} />
+        <noscript>
+          <style>{"[data-preloader]{display:none!important}"}</style>
+        </noscript>
       </head>
       <body className="min-h-[901px] font-sans">
         <MotionProvider>
+          <Preloader />
           <ScrollProgress />
+          <ScrollTelemetry />
           <Navbar />
           <RouteTransition>{children}</RouteTransition>
           <FramerBadge />

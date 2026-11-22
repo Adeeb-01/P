@@ -7,6 +7,8 @@ import { useMagnetic } from "@/components/motion/hooks";
 import { HeroAura } from "@/components/hero/HeroAura";
 import { PortraitSheen } from "@/components/hero/PortraitSheen";
 import { Shine } from "@/components/motion/Shine";
+import { ProximityChar, ProximityProvider, useProximityField } from "@/components/motion/ProximityText";
+import { usePreloaderDone } from "@/components/transition/Preloader";
 
 const PORTRAIT = "/assets/images/framerusercontent.com/yHECzzvtCQT7X8sGipPGW5sEc-f4fe77a16e.webp";
 
@@ -14,8 +16,17 @@ const fade = "max-tab:transition-none motion-reduce:duration-[0.01ms]";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 const HEADLINE = ["Carter is solving problems", "through strategic design and", "compelling visuals"];
+const HEADLINE_LABEL = HEADLINE.join(" ");
 
-const word: Variants = {
+/** Words with a global character index (stable, computed once) for the proximity field. */
+const HEADLINE_WORDS = (() => {
+  let index = 0;
+  return HEADLINE.map((line) =>
+    line.split(" ").map((text) => ({ text, chars: Array.from(text).map((char) => ({ char, index: index++ })) })),
+  );
+})();
+
+const word_: Variants = {
   hidden: { y: "110%" },
   show: (delay: number) => ({ y: "0%", transition: { duration: 0.9, ease: EASE, delay } }),
 };
@@ -40,7 +51,13 @@ function EmailCta() {
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
   const portraitRef = useRef<HTMLImageElement>(null);
-  const [ready, setReady] = useState(false);
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const [decoded, setReady] = useState(false);
+  const preloaderDone = usePreloaderDone();
+  // The entrance waits for both the decoded portrait and the opening curtain.
+  const ready = decoded && preloaderDone;
+  const [revealed, setRevealed] = useState(false);
+  const field = useProximityField(headingRef, heroRef, { radius: 170, lift: 9, scale: 0.1, rotate: 5 });
 
   // Scroll parallax: the portrait sinks slightly slower than the page, the glow drifts further.
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -71,10 +88,17 @@ export function Hero() {
     };
   }, []);
 
+  useEffect(() => {
+    if (!ready) return;
+    const id = window.setTimeout(() => setRevealed(true), 1500);
+    return () => window.clearTimeout(id);
+  }, [ready]);
+
   return (
     <header
       ref={heroRef}
       id="hero"
+      data-telemetry="01 Hero"
       className="relative h-screen scroll-mt-20 overflow-hidden bg-canvas max-xl:flex max-xl:h-auto max-xl:min-h-0 max-xl:flex-col max-xl:justify-start"
     >
       {/* Ambient violet glow floating behind the portrait. */}
@@ -113,7 +137,7 @@ export function Hero() {
         )}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- exact intrinsic sizing is required for pixel parity */}
-        <img ref={portraitRef} src={PORTRAIT} width={1242} height={986} alt="Michael Carter, Digital Product Designer" className="block h-full w-full" />
+        <img ref={portraitRef} data-hero-portrait src={PORTRAIT} width={1242} height={986} alt="Michael Carter, Digital Product Designer" className="block h-full w-full" />
         <PortraitSheen src={PORTRAIT} pointerRoot={heroRef} />
       </m.div>
 
@@ -146,29 +170,35 @@ export function Hero() {
               <span>2 projects left in March</span>
             </div>
             {/* Masked reveal: each word rises from behind its own clip; lines stagger on desktop. */}
-            <m.h1
-              initial="hidden"
-              animate={ready ? "show" : "hidden"}
-              className="m-0 w-[600px] text-[36px] leading-[39.6px] font-medium tracking-[-1.08px] text-fg max-xl:w-full max-xl:text-[32px] max-xl:leading-[35.2px] max-xl:tracking-[-0.96px]"
-            >
-              {HEADLINE.map((line, lineIndex) => (
-                <span key={line} className="block max-xl:inline">
-                  {line.split(" ").map((text, index, words) => {
-                    const delay = 0.12 + lineIndex * 0.1 + index * 0.035;
-                    return (
-                      <span key={`${lineIndex}-${index}`}>
-                        <span className="-mb-[0.12em] inline-block overflow-hidden pb-[0.12em] align-top">
-                          <m.span className="inline-block will-change-transform" variants={word} custom={delay}>
-                            {text}
-                          </m.span>
+            <ProximityProvider field={field}>
+              <m.h1
+                ref={headingRef}
+                aria-label={HEADLINE_LABEL}
+                initial="hidden"
+                animate={ready ? "show" : "hidden"}
+                className="relative m-0 w-[600px] text-[36px] leading-[39.6px] font-medium tracking-[-1.08px] text-fg max-xl:w-full max-xl:text-[32px] max-xl:leading-[35.2px] max-xl:tracking-[-0.96px]"
+              >
+                {HEADLINE_WORDS.map((words, lineIndex) => (
+                  <span key={lineIndex} className="block max-xl:inline">
+                    {words.map((word, index) => {
+                      const delay = 0.12 + lineIndex * 0.1 + index * 0.035;
+                      return (
+                        <span key={`${lineIndex}-${index}`}>
+                          <span className={clsx("-mb-[0.12em] inline-block pb-[0.12em] align-top", revealed ? "overflow-visible" : "overflow-hidden")}>
+                            <m.span className="inline-block will-change-transform" variants={word_} custom={delay}>
+                              {word.chars.map(({ char, index: charIndex }) => (
+                                <ProximityChar key={charIndex} char={char} index={charIndex} />
+                              ))}
+                            </m.span>
+                          </span>
+                          {index < words.length - 1 || lineIndex < HEADLINE_WORDS.length - 1 ? " " : ""}
                         </span>
-                        {index < words.length - 1 || lineIndex < HEADLINE.length - 1 ? " " : ""}
-                      </span>
-                    );
-                  })}
-                </span>
-              ))}
-            </m.h1>
+                      );
+                    })}
+                  </span>
+                ))}
+              </m.h1>
+            </ProximityProvider>
           </div>
 
           <div

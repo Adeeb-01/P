@@ -5,7 +5,7 @@ import { ScrambleText } from "@/components/motion/ScrambleText";
 
 export function Services() {
   return (
-    <section aria-labelledby="services-title" className="flex w-full justify-center bg-canvas pb-[200px] max-md:pb-[100px]">
+    <section aria-labelledby="services-title" data-telemetry="04 Services" className="flex w-full justify-center bg-canvas pb-[200px] max-md:pb-[100px]">
       <div className="w-[min(1120px,calc(100%-80px))] max-md:w-[calc(100%-40px)]">
         <Reveal as="header" className="mb-[60px] grid grid-cols-[40%_60%] items-start max-tab:grid-cols-1 max-tab:gap-4">
           <h2 id="services-title" className="m-0 scroll-mt-20 text-eyebrow font-normal text-slate">

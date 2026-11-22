@@ -5,6 +5,8 @@
 @custom-variant hover-fine (@media (hover: hover) and (pointer: fine));
 /* Theme polarity: set on <html data-theme="light|dark"> by the pre-paint script / ThemeToggle. */
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+/* Set by the pre-paint script on repeat session visits / reduced motion: hides the preloader. */
+@custom-variant preloaded (&:where([data-preloaded] *));
 
 /* ── Theme-aware semantic colours (light defaults, dark overrides) ── */
 :root {

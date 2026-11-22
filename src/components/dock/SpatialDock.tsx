@@ -9,12 +9,15 @@ import { ScrambleText } from "@/components/motion/ScrambleText";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { SoundToggle } from "@/components/sound/SoundToggle";
 import { openQuickJump } from "@/components/works/ProjectQuickJump";
+import { useLenis } from "@/components/motion/SmoothScroll";
 
 const TILE = 44; // resting tile size (px)
 const GAP = 6;
 const RANGE = 150; // influence radius of the magnification bell (px)
 const AMPLITUDE = 0.62; // peak extra scale at the cursor
 const SPRING = { stiffness: 420, damping: 32, mass: 0.5 };
+const RING_R = 15;
+const RING_C = 2 * Math.PI * RING_R;
 
 /** Cosine-bell magnification + neighbour spreading for every tile, from one pointer position. */
 function layoutFor(pointer: number, centers: number[]) {
@@ -116,7 +119,9 @@ export function SpatialDock() {
   const pointer = useMotionValue(-1);
   const [centers, setCenters] = useState<number[]>([]);
   const [shown, setShown] = useState(false);
-  const { scrollY } = useScroll();
+  const { scrollY, scrollYProgress } = useScroll();
+  const lenis = useLenis();
+  const ringOffset = useTransform(scrollYProgress, (progress) => RING_C * (1 - progress));
   const lastY = useRef(0);
   const idleTimer = useRef(0);
 
@@ -208,6 +213,23 @@ export function SpatialDock() {
         </Tile>
         <Tile index={5} label="Sound" centers={centers} pointer={pointer}>
           <SoundToggle className="h-full w-full rounded-2xl hover:bg-transparent" />
+        </Tile>
+        <Tile index={6} label="Back to top" centers={centers} pointer={pointer}>
+          <button
+            type="button"
+            aria-label="Back to top"
+            onClick={() => (lenis ? lenis.scrollTo(0, { duration: 1.4 }) : window.scrollTo({ top: 0, behavior: "smooth" }))}
+            className="relative grid cursor-pointer place-items-center border-0 bg-transparent text-fg"
+          >
+            {/* Radial reading progress: stroke-dashoffset follows scrollYProgress. */}
+            <svg viewBox="0 0 36 36" aria-hidden="true" className="absolute inset-0 m-auto h-[36px] w-[36px] -rotate-90">
+              <circle cx="18" cy="18" r={RING_R} fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="2" />
+              <m.circle cx="18" cy="18" r={RING_R} fill="none" stroke="var(--color-violet)" strokeWidth="2" strokeLinecap="round" strokeDasharray={RING_C} style={{ strokeDashoffset: ringOffset }} />
+            </svg>
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="relative h-[14px] w-[14px]" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M6 11l6-6 6 6" />
+            </svg>
+          </button>
         </Tile>
       </div>
     </m.div>
