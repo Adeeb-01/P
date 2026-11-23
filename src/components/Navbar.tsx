@@ -67,9 +67,7 @@ function CtaButton({ className, onClick }: { className?: string; onClick?: () =>
   const magnetic = useMagnetic(0.3);
   return (
     <m.a
-      href="https://framer.link/P8mvaz1"
-      target="_blank"
-      rel="noopener"
+      href="/contact"
       onClick={onClick}
       style={{ x: magnetic.x, y: magnetic.y }}
       onPointerMove={magnetic.onPointerMove}
@@ -82,7 +80,7 @@ function CtaButton({ className, onClick }: { className?: string; onClick?: () =>
       )}
     >
       <Shine />
-      Use For Free
+      Hire Me
     </m.a>
   );
 }
@@ -155,7 +153,7 @@ export function Navbar() {
         <div className="flex h-12 w-full items-center justify-between">
           <m.div layout="position" transition={SHELL_SPRING} className="flex w-[240px] items-center max-xl:w-auto max-xl:flex-auto">
             <Link href="/" className="text-brand font-medium whitespace-nowrap text-fg">
-              Michael Carter
+              Adeeb Alsaleh
             </Link>
           </m.div>
 

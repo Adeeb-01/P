@@ -16,7 +16,7 @@ const NAVIGATION_TIMEOUT_MS = 1500;
 const EASE_CURTAIN = [0.76, 0, 0.24, 1] as const;
 const EASE_OUT = [0.22, 1, 0.36, 1] as const;
 
-/** One key per page: "/", "/works", "/works/pulma", "/contact" (trailing slashes ignored). */
+/** One key per page: "/", "/works", "/works/easy-learning", "/contact" (trailing slashes ignored). */
 function routeKey(pathname: string) {
   const normalized = pathname.replace(/\/+$/, "");
   return normalized === "" ? "home" : normalized;

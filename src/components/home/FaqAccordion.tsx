@@ -6,40 +6,32 @@ import clsx from "clsx";
 
 const FAQS = [
   {
-    key: "timeline",
-    question: "What's your typical project timeline?",
+    key: "stack",
+    question: "What's your core tech stack?",
     answer:
-      "The timeline depends on the project's scope and complexity. Branding and UI/UX projects usually take 2–6 weeks, while Framer website development can range from 1–4 weeks. I'll provide a detailed timeline after the project brief",
+      "I work across the MERN stack — MongoDB, Express.js, React and Node.js — with Next.js and TypeScript on the frontend, Python for AI tooling, and MySQL or MongoDB depending on the data model.",
   },
   {
-    key: "revisions",
-    question: "Do you offer revisions?",
+    key: "ai",
+    question: "Can you integrate AI into an existing product?",
     answer:
-      "Yes! I believe in collaboration and refining the work to match your vision. Each project includes a set number of revision rounds, which we'll define in the project scope",
+      "Yes. I integrate LLM APIs and build Retrieval-Augmented Generation (RAG) pipelines with VectorDB semantic search, so answers stay grounded in your own data — connected to your platform through clean, documented APIs.",
   },
   {
-    key: "get-started",
-    question: "What do you need from me to get started?",
+    key: "workflow",
+    question: "What does your development process look like?",
     answer:
-      "To kick things off, I'll need details about your business, goals, and any references or inspirations you have in mind. If it's a UI/UX or Framer project, wireframes or content assets would also be helpful",
+      "It's spec-driven: requirements and architecture first, then database and API design, frontend and AI implementation, and finally testing and documentation — so every stage is clear and reviewable.",
   },
   {
-    key: "brand-guidelines",
-    question: "Can you work with my existing brand guidelines?",
-    answer:
-      "Absolutely! If you already have brand guidelines, I'll ensure the designs align with your established identity while still bringing fresh creativity to the project",
-  },
-  {
-    key: "support",
-    question: "Do you provide post-project support?",
-    answer:
-      "Yes! I offer support after project completion to ensure a smooth transition. For Framer websites, I provide guidance on managing content, and for branding/UI work, I can assist with additional assets if needed",
+    key: "availability",
+    question: "Are you available for freelance or full-time roles?",
+    answer: "Yes — I'm open to both freelance projects and full-time software engineering roles, working remotely or from Damascus, Syria.",
   },
   {
     key: "contact",
     question: "What's the best way to reach you?",
-    answer:
-      "You can reach me via email or book a call through my website. I aim to respond within 24 hours on weekdays. Let's chat about your project!",
+    answer: "Email me at adeeb2002alsalh@gmail.com or message me on WhatsApp at +963 996 536 128. You can also browse my code on GitHub at github.com/Adeeb-01.",
   },
 ];
 

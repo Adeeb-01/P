@@ -60,7 +60,7 @@ export function QuickJumpPalette() {
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return PROJECTS;
-    return PROJECTS.filter((project) => [project.title, ...project.tags, project.year].join(" ").toLowerCase().includes(q));
+    return PROJECTS.filter((project) => [project.title, project.tagline, ...project.tags].join(" ").toLowerCase().includes(q));
   }, [query]);
 
   // Reset the search each time the palette opens (derived during render, not in an effect).
@@ -158,7 +158,7 @@ export function QuickJumpPalette() {
                     setActive(0);
                   }}
                   onKeyDown={onInputKey}
-                  placeholder="Search projects, tags, year…"
+                  placeholder="Search projects, stack, topics…"
                   className="h-16 w-full border-0 bg-transparent text-[18px] tracking-[-0.36px] text-fg outline-none placeholder:text-muted"
                 />
                 <kbd className="rounded-lg border border-line bg-surface px-2 py-1 font-sans text-[11px] leading-none text-muted">Esc</kbd>
@@ -185,7 +185,7 @@ export function QuickJumpPalette() {
                       <span className="flex min-w-0 flex-1 flex-col">
                         <span className="text-[17px] leading-[1.3] font-medium tracking-[-0.4px] text-fg">{project.title}</span>
                         <span className="truncate text-[13px] text-muted">
-                          {project.tags.join(" · ")} — {project.year}
+                          {project.tagline} — {project.tags.join(" · ")}
                         </span>
                       </span>
                       <span aria-hidden="true" className={clsx("text-violet transition-opacity", index === active ? "opacity-100" : "opacity-0")}>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
 import { usePrefersReducedMotion } from "@/components/motion/hooks";
+import type { ServiceKey } from "@/lib/services";
 import clsx from "clsx";
 
 /** Cycles 0…count-1 every `ms` (paused for reduced motion). */
@@ -19,74 +20,70 @@ function useCycle(count: number, ms: number) {
 
 const frame = "relative h-[260px] overflow-hidden rounded-[20px] max-md:h-[220px]";
 
-/* ── Branding: palette + type specimen ─────────────────────────────────── */
+/* ── AI & RAG: retrieval pipeline ──────────────────────────────────────── */
 
-const PALETTE = [
-  { hex: "#7430F7", name: "Violet" },
-  { hex: "#111111", name: "Ink" },
-  { hex: "#F5F2FF", name: "Mist" },
-  { hex: "#EFCE03", name: "Sun" },
-  { hex: "#00C047", name: "Leaf" },
+const PIPELINE = [
+  { label: "Query", color: "#111111" },
+  { label: "Embed", color: "#7430F7" },
+  { label: "Retrieve", color: "#00C047" },
+  { label: "Augment", color: "#EFCE03" },
+  { label: "Generate", color: "#B79CFF" },
 ];
-const WEIGHTS = [
-  { weight: "font-normal", label: "Regular 400" },
-  { weight: "font-medium", label: "Medium 500" },
-  { weight: "font-bold", label: "Bold 700" },
+const STATUS = [
+  { title: "Embedding query", detail: "1536-dim vector" },
+  { title: "Top-k retrieval", detail: "5 passages · VectorDB" },
+  { title: "Grounded answer", detail: "Cited from sources ✓" },
 ];
 
-export function BrandingDiagram() {
-  const active = useCycle(WEIGHTS.length, 1500);
+export function RagDiagram() {
+  const stage = useCycle(PIPELINE.length, 900);
+  const status = Math.min(STATUS.length - 1, Math.floor((stage / PIPELINE.length) * STATUS.length));
   return (
     <div className={clsx(frame, "grid grid-cols-[1.1fr_1fr] gap-3 bg-elevated p-4 max-md:grid-cols-1")}>
-      <div className="flex gap-2 max-md:h-[90px]">
-        {PALETTE.map((swatch, index) => (
+      <div className="flex flex-col justify-center gap-2 max-md:h-[120px]">
+        {PIPELINE.map((step, index) => (
           <m.div
-            key={swatch.hex}
-            initial={{ y: 40, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 260, damping: 24, delay: 0.25 + index * 0.07 }}
-            className="flex flex-1 flex-col justify-end rounded-2xl border border-ink/[0.06] p-2"
-            style={{ background: swatch.hex }}
+            key={step.label}
+            initial={{ x: -24, opacity: 0 }}
+            animate={{ x: 0, opacity: index <= stage ? 1 : 0.35 }}
+            transition={{ type: "spring", stiffness: 260, damping: 24, delay: 0.2 + index * 0.06 }}
+            className="flex items-center gap-2.5 rounded-xl border border-fg/[0.06] bg-surface px-3 py-1.5"
           >
-            <span className={clsx("text-[10px] leading-tight font-medium", index === 1 || index === 0 ? "text-white/80" : "text-ink/60")}>
-              {swatch.name}
-              <br />
-              {swatch.hex}
-            </span>
+            <span className="h-2.5 w-2.5 flex-none rounded-full" style={{ background: step.color }} />
+            <span className="text-[12px] font-medium text-fg">{step.label}</span>
+            {index === stage && <m.span layoutId="rag-active" className="ml-auto h-1.5 w-1.5 rounded-full bg-violet" />}
           </m.div>
         ))}
       </div>
       <div className="relative flex flex-col justify-between rounded-2xl bg-surface p-4 max-md:hidden">
-        <span className="text-[11px] tracking-[0.08em] text-muted uppercase">Instrument Sans</span>
-        <div className="relative h-[120px]">
-          <AnimatePresence mode="popLayout" initial={false}>
-            <m.span
-              key={active}
-              initial={{ y: 30, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -30, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 300, damping: 28 }}
-              className={clsx("absolute bottom-0 left-0 text-[112px] leading-[0.9] tracking-[-0.05em] text-fg", WEIGHTS[active].weight)}
-            >
-              Aa
-            </m.span>
-          </AnimatePresence>
-        </div>
-        <span className="text-[12px] text-fg-soft">{WEIGHTS[active].label}</span>
+        <span className="text-[11px] tracking-[0.08em] text-muted uppercase">RAG pipeline</span>
+        <AnimatePresence mode="popLayout" initial={false}>
+          <m.div
+            key={status}
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            exit={{ y: -20, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 28 }}
+            className="flex flex-col gap-1"
+          >
+            <span className="text-[26px] leading-[1.05] font-medium tracking-[-0.04em] text-fg">{STATUS[status].title}</span>
+            <span className="text-[12px] text-fg-soft">{STATUS[status].detail}</span>
+          </m.div>
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-/* ── Framer: breakpoint resizer ────────────────────────────────────────── */
+/* ── Full-stack: responsive Next.js breakpoint resizer ─────────────────── */
 
 const BREAKPOINTS = [
-  { label: "Desktop · 1440", inset: 0, cols: 3 },
-  { label: "Tablet · 810", inset: 20, cols: 2 },
-  { label: "Mobile · 390", inset: 34, cols: 1 },
+  { label: "Next.js · Desktop 1440", inset: 0, cols: 3 },
+  { label: "Next.js · Tablet 810", inset: 20, cols: 2 },
+  { label: "Next.js · Mobile 390", inset: 34, cols: 1 },
 ];
 
-export function FramerDiagram() {
+export function FullStackDiagram() {
   const active = useCycle(BREAKPOINTS.length, 1900);
   const bp = BREAKPOINTS[active];
   return (
@@ -141,7 +138,7 @@ export function FramerDiagram() {
   );
 }
 
-/* ── UI/UX: wireframe → UI wipe ────────────────────────────────────────── */
+/* ── Backend: schema → live admin dashboard wipe ────────────────────────────────────────── */
 
 function Screen({ ui }: { ui: boolean }) {
   return (
@@ -167,7 +164,7 @@ function Screen({ ui }: { ui: boolean }) {
   );
 }
 
-export function UiUxDiagram() {
+export function BackendDiagram() {
   const reduced = usePrefersReducedMotion();
   const loop = reduced
     ? { clipPath: "inset(0% 0% 0% 0%)" }
@@ -183,13 +180,13 @@ export function UiUxDiagram() {
       >
         <Screen ui />
       </m.div>
-      <span className="absolute bottom-3 left-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-medium text-ink backdrop-blur">Wireframe → UI</span>
+      <span className="absolute bottom-3 left-3 rounded-full bg-white/85 px-2.5 py-1 text-[11px] font-medium text-ink backdrop-blur">Schema → Dashboard</span>
     </div>
   );
 }
 
-export function ServiceDiagram({ serviceKey }: { serviceKey: string }) {
-  if (serviceKey === "branding") return <BrandingDiagram />;
-  if (serviceKey === "framer-development") return <FramerDiagram />;
-  return <UiUxDiagram />;
+export function ServiceDiagram({ serviceKey }: { serviceKey: ServiceKey }) {
+  if (serviceKey === "ai-rag") return <RagDiagram />;
+  if (serviceKey === "full-stack") return <FullStackDiagram />;
+  return <BackendDiagram />;
 }

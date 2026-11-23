@@ -35,8 +35,7 @@ async function deliver({ name, email, message }: Record<ContactField, string>) {
     return;
   }
 
-  const to = process.env.CONTACT_TO_EMAIL;
-  if (!to) throw new Error("CONTACT_TO_EMAIL is not configured.");
+  const to = process.env.CONTACT_TO_EMAIL || "adeeb2002alsalh@gmail.com";
   const from = process.env.CONTACT_FROM_EMAIL || "Portfolio Contact <onboarding@resend.dev>";
 
   const response = await fetch("https://api.resend.com/emails", {

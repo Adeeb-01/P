@@ -3,14 +3,14 @@ import { ProjectCard } from "@/components/ProjectCard";
 import { PROJECTS } from "@/lib/projects";
 import { VelocitySkew } from "@/components/motion/VelocitySkew";
 import { ClipReveal } from "@/components/motion/ClipReveal";
-import { ScrambleText } from "@/components/motion/ScrambleText";
+import { EditorialSplit } from "@/components/motion/EditorialSplit";
 
 export function FeaturedWorks() {
   return (
     <main id="projects" data-telemetry="02 Works" className="flex w-full scroll-mt-20 justify-center bg-canvas pt-[120px] pb-[200px] max-md:pt-20 max-md:pb-[100px]">
       <div className="flex w-[min(1120px,calc(100%-80px))] flex-col gap-10 max-md:w-[calc(100%-40px)]">
         <div className="flex min-h-12 items-center justify-between">
-          <h2 className="m-0 text-section font-medium text-fg"><ScrambleText self text="Featured works" /></h2>
+          <EditorialSplit segments={[{ text: "Featured works" }]} className="m-0 text-section font-medium text-fg" />
           <Link
             href="/works"
             className="group inline-flex h-12 w-min items-center justify-center gap-3 rounded-2xl border border-transparent bg-surface px-6 py-3 text-btn font-medium whitespace-nowrap text-fg-soft shadow-button transition-colors duration-[220ms] ease-out hover:bg-surface-hover hover:text-fg focus-visible:bg-surface-hover focus-visible:text-fg active:bg-surface-hover active:text-fg max-xl:w-12 max-xl:min-w-12 max-xl:gap-0 max-xl:overflow-hidden max-xl:p-3.5 max-xl:text-[0px]"

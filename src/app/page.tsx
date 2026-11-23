@@ -9,7 +9,7 @@ import { ClosingSection } from "@/components/ClosingSection";
 import { VelocityMarquee } from "@/components/motion/VelocityMarquee";
 
 export const metadata: Metadata = {
-  title: "Michael Carter — Digital Product Designer",
+  title: "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer",
 };
 
 export default function HomePage() {

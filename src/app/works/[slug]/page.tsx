@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const project = getProject(slug);
   if (!project) return {};
   return {
-    title: `${project.title} — Case Study — Michael Carter`,
+    title: `${project.title} — Case Study — Mohammad Adeeb Alsaleh`,
     description: project.caseStudy.summary,
     openGraph: { title: `${project.title} — Case Study`, images: [{ url: project.image.src }] },
   };
@@ -59,19 +59,18 @@ export default async function CaseStudyPage({ params }: Params) {
           <div data-telemetry="01 Overview">
           {/* Hero */}
           <Reveal>
-            <p className="m-0 mb-6 inline-flex items-center gap-2 rounded-full border border-dashed border-violet/40 bg-violet/10 px-3 py-1.5 text-[13px] leading-none font-medium text-violet">
-              <span aria-hidden="true">●</span> <ScrambleText self text="Sample case study — placeholder content" />
+            <p className="m-0 mb-6 inline-flex items-center gap-2 rounded-full bg-violet/10 px-3 py-1.5 text-[13px] leading-none font-medium text-violet">
+              <span aria-hidden="true">●</span> <ScrambleText self text={project.tagline} />
             </p>
             <h1 className="m-0 text-[120px] leading-[0.92] font-medium tracking-[-0.055em] text-fg max-xl:text-[88px] max-md:text-[56px]">{project.title}</h1>
             <p className="m-0 mt-8 max-w-[720px] text-[24px] leading-[1.35] tracking-[-0.6px] text-fg-soft max-md:text-[20px]">{study.summary}</p>
           </Reveal>
 
-          <Reveal delay={0.1} className="mt-14 grid grid-cols-4 gap-6 border-t border-fg/[0.08] pt-6 max-xl:grid-cols-2 max-md:mt-10">
+          <Reveal delay={0.1} className="mt-14 grid grid-cols-3 gap-6 border-t border-fg/[0.08] pt-6 max-md:mt-10 max-md:grid-cols-1">
             {[
               ["Role", study.role],
-              ["Client", study.client],
-              ["Year", project.year],
-              ["Services", study.services.join(", ")],
+              ["Type", study.type],
+              ["Stack", project.tags.join(", ")],
             ].map(([label, value]) => (
               <div key={label}>
                 <p className="m-0 text-credit text-muted">{label}</p>
@@ -108,18 +107,17 @@ export default async function CaseStudyPage({ params }: Params) {
             </ol>
           </section>
 
-          {/* Metrics (placeholders) */}
+          {/* Technical highlights */}
           <section data-telemetry="04 Impact" className="mt-[120px] max-md:mt-20" aria-labelledby="metrics-title">
             <div className="mb-8 flex items-baseline justify-between gap-4">
               <h2 id="metrics-title" className="m-0 text-eyebrow font-normal text-slate">
                 Impact
               </h2>
-              <span className="text-credit text-muted">Placeholder metrics — replace with real results</span>
             </div>
             <div className="grid grid-cols-3 gap-3 max-md:grid-cols-1">
               {study.metrics.map((metric, index) => (
-                <Reveal key={metric.label} delay={index * 0.08} className="rounded-3xl border border-dashed border-fg/15 bg-canvas p-8">
-                  <p className="m-0 text-[64px] leading-none font-medium tracking-[-0.05em] text-fg/30">{metric.value}</p>
+                <Reveal key={metric.label} delay={index * 0.08} className="rounded-3xl border border-line/70 bg-surface p-8">
+                  <p className="m-0 text-[clamp(34px,3.6vw,52px)] leading-none font-medium tracking-[-0.045em] break-words text-fg">{metric.value}</p>
                   <p className="m-0 mt-4 text-body text-muted">{metric.label}</p>
                 </Reveal>
               ))}
@@ -144,7 +142,7 @@ export default async function CaseStudyPage({ params }: Params) {
               <h2 id="gallery-title" className="m-0 text-section font-medium text-fg">
                 Details
               </h2>
-              <span className="text-credit text-muted">Close-ups of the cover — swap in real screens</span>
+              <span className="text-credit text-muted">Interface details</span>
             </div>
           </section>
         </div>

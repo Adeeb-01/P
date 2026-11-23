@@ -6,7 +6,7 @@ import clsx from "clsx";
 import { useClosingStage } from "@/components/closing/ClosingStage";
 import { ProximityChar, ProximityProvider, useProximityField } from "@/components/motion/ProximityText";
 
-const NAME = "Michael Carter";
+const NAME = "Adeeb Alsaleh";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /** Letters with a stable index for the proximity field (spaces are not part of the field). */

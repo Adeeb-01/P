@@ -91,7 +91,7 @@ export function Preloader() {
       className="fixed inset-0 z-[120] flex flex-col justify-between bg-ink p-10 text-white [clip-path:inset(0%_0%_0%_0%)] preloaded:hidden max-md:p-5"
     >
       <div className="flex items-center justify-between text-small text-white/55">
-        <span>Michael Carter</span>
+        <span>Adeeb Alsaleh</span>
         <span>Portfolio © 2026</span>
       </div>
       <div className="flex flex-col gap-6">

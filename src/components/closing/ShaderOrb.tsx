@@ -5,6 +5,8 @@ import { m, useMotionValue, useSpring, useTransform } from "motion/react";
 import { ShaderObject } from "@/components/ShaderObject";
 import { useClosingStage } from "@/components/closing/ClosingStage";
 import { usePointerEffects } from "@/components/motion/hooks";
+import type { RefObject } from "react";
+import type { ShaderParams } from "@/lib/shader-params";
 
 const TILT = 14;
 const SPRING = { stiffness: 120, damping: 16, mass: 0.6 };
@@ -14,7 +16,7 @@ const SPRING = { stiffness: 120, damping: 16, mass: 0.6 };
  * Pointer tracking spans the whole closing section, and is forwarded to the shader's own
  * mouse uniforms so the surface reacts as the cursor approaches (not only when directly over it).
  */
-export function ShaderOrb({ className }: { className?: string }) {
+export function ShaderOrb({ className, params }: { className?: string; params?: RefObject<ShaderParams | null> }) {
   const stage = useClosingStage();
   const enabled = usePointerEffects();
   const nx = useMotionValue(0);
@@ -67,7 +69,7 @@ export function ShaderOrb({ className }: { className?: string }) {
         />
       </m.div>
       <m.div style={enabled ? { rotateX, rotateY, transformPerspective: 600 } : undefined} className="relative">
-        <ShaderObject className={className} trackingRoot={stage} />
+        <ShaderObject className={className} trackingRoot={stage} params={params} />
       </m.div>
     </div>
   );

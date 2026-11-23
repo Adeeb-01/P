@@ -1,34 +1,27 @@
 import type { Metadata } from "next";
-import { ProjectCard } from "@/components/ProjectCard";
 import { ClosingSection } from "@/components/ClosingSection";
 import { QuickJumpTrigger } from "@/components/works/ProjectQuickJump";
-import { VelocitySkew } from "@/components/motion/VelocitySkew";
-import { ClipReveal } from "@/components/motion/ClipReveal";
+import { SpatialShowcase } from "@/components/works/SpatialShowcase";
 import { PROJECTS } from "@/lib/projects";
 
 export const metadata: Metadata = {
-  title: "Works — Michael Carter",
+  title: "Works — Mohammad Adeeb Alsaleh",
 };
 
 export default function WorksPage() {
   return (
     <>
-      <main className="w-full overflow-hidden pb-[200px] max-md:pb-[100px]">
-        <div className="mx-auto flex w-[min(1120px,calc(100%-80px))] flex-col gap-[60px] max-md:w-[calc(100%-40px)] max-md:gap-10">
+      {/* overflow-x-clip (not hidden): keeps the spatial track's sticky stage working. */}
+      <main className="w-full overflow-x-clip pb-[200px] max-md:pb-[100px]">
+        <div className="mx-auto mb-[60px] flex w-[min(1120px,calc(100%-80px))] flex-col max-md:mb-10 max-md:w-[calc(100%-40px)]">
           <header className="flex w-full items-end justify-between gap-6 pt-40 max-md:flex-col max-md:items-start max-md:pt-[120px]">
             <h1 className="m-0 w-full max-w-[650px] text-[40px] leading-[1.1] font-medium tracking-[-0.03em] max-tab:text-[32px]">
-              <span className="text-muted">Designing seamless experiences that</span> elevate brands and engage users
+              <span className="text-muted">Selected engineering work</span> across full-stack web and AI-powered systems
             </h1>
             <QuickJumpTrigger className="flex-none" />
           </header>
-          <VelocitySkew className="grid grid-cols-2 gap-3 pb-20 max-xl:grid-cols-1 max-md:pb-0">
-            {PROJECTS.map((project, index) => (
-              <ClipReveal key={project.slug} delay={(index % 2) * 0.08}>
-                <ProjectCard project={project} variant="gallery" />
-              </ClipReveal>
-            ))}
-          </VelocitySkew>
         </div>
+        <SpatialShowcase projects={PROJECTS} />
       </main>
       <ClosingSection />
     </>

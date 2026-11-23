@@ -4,12 +4,12 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, m } from "motion/react";
 import clsx from "clsx";
-import { SpotlightCard } from "@/components/motion/SpotlightCard";
+import { RefractiveCard } from "@/components/motion/RefractiveCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { Shine } from "@/components/motion/Shine";
 import { useLenis } from "@/components/motion/SmoothScroll";
 import { ServiceDiagram } from "@/components/home/ServiceDiagrams";
-import type { Service } from "@/lib/services";
+import { CONTACT_EMAIL, type Service } from "@/lib/services";
 import { Portal } from "@/components/Portal";
 
 const SHELL_SPRING = { type: "spring", stiffness: 300, damping: 34, mass: 0.9 } as const;
@@ -21,7 +21,7 @@ function ServiceCard({ service, hidden, onOpen }: { service: Service; hidden: bo
   const panel = p ? "bg-violet" : "bg-elevated";
 
   return (
-    <SpotlightCard
+    <RefractiveCard
       tone={p ? "dark" : "light"}
       data-cursor="explore"
       className={clsx(
@@ -93,7 +93,7 @@ function ServiceCard({ service, hidden, onOpen }: { service: Service; hidden: bo
           ))}
         </div>
       </div>
-    </SpotlightCard>
+    </RefractiveCard>
   );
 }
 
@@ -179,7 +179,7 @@ function ServiceDetail({ service, onClose }: { service: Service; onClose: () => 
               ))}
             </div>
             <a
-              href={`mailto:rosyidqoim@gmail.com?subject=${service.subject}`}
+              href={`mailto:${CONTACT_EMAIL}?subject=${service.subject}`}
               className={clsx(
                 "group/btn relative isolate inline-flex h-12 items-center gap-2 overflow-hidden rounded-2xl px-6 text-btn font-medium transition-colors active:scale-[0.97]",
                 p ? "bg-white text-ink hover:bg-light" : "bg-inverse text-on-inverse hover:bg-violet hover:text-white",

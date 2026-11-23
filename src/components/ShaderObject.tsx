@@ -3,6 +3,7 @@
 import { useEffect, useRef, type RefObject } from "react";
 import clsx from "clsx";
 import { FRAGMENT_BODY } from "@/lib/shader-fragment";
+import { DEFAULT_SHADER_PARAMS, hueRotate, type ShaderParams } from "@/lib/shader-params";
 
 const HEIGHTMAP_SRC = "/assets/images/luzia-shader-heightmap.png";
 
@@ -86,8 +87,11 @@ function loadImage(src: string) {
 export function ShaderObject({
   className,
   trackingRoot,
+  params,
 }: {
   className?: string;
+  /** Visitor-controlled targets (ShaderLab). Eased per frame onto the existing uniforms. */
+  params?: RefObject<ShaderParams | null> | null;
   /** Element whose pointer movement drives the shader (defaults to the canvas itself). */
   trackingRoot?: RefObject<HTMLElement | null> | null;
 }) {
@@ -148,6 +152,30 @@ export function ShaderObject({
       }
 
       const loc = (name: string) => gl.getUniformLocation(program, name);
+      // Eased live parameters (ShaderLab). Palette colours: violet + mist get hue-rotated.
+      const live = { ...DEFAULT_SHADER_PARAMS };
+      let uploadedHue = -1;
+      let settled = true;
+      const applyParams = () => {
+        const target = params?.current;
+        if (!target) return;
+        const ease = 0.08;
+        live.distortion += (target.distortion - live.distortion) * ease;
+        live.flow += (target.flow - live.flow) * ease;
+        live.hue += (target.hue - live.hue) * ease;
+        settled =
+          Math.abs(target.distortion - live.distortion) < 0.002 && Math.abs(target.flow - live.flow) < 0.002 && Math.abs(target.hue - live.hue) < 0.002;
+        gl.uniform1f(loc("u_turbAmp"), UNIFORMS.u_turbAmp * (0.25 + 1.5 * live.distortion));
+        gl.uniform1f(loc("u_bend"), UNIFORMS.u_bend * (0.4 + 1.2 * live.distortion));
+        gl.uniform1f(loc("u_speed"), UNIFORMS.u_speed * (0.25 + 1.5 * live.flow));
+        gl.uniform1f(loc("u_waveFreq"), UNIFORMS.u_waveFreq * (0.6 + 0.8 * live.flow));
+        if (Math.abs(live.hue - uploadedHue) > 0.0005) {
+          uploadedHue = live.hue;
+          const v = hueRotate(116 / 255, 48 / 255, 247 / 255, live.hue);
+          const mist = hueRotate(245 / 255, 242 / 255, 255 / 255, live.hue);
+          gl.uniform4fv(loc("u_colors[0]"), new Float32Array([17 / 255, 17 / 255, 17 / 255, 1, v[0], v[1], v[2], 1, mist[0], mist[1], mist[2], 1]));
+        }
+      };
       // `impulse` is a click "energy pulse" that decays; `energy` follows pointer speed.
       const mouse = { x: -999, y: -999, px: -999, py: -999, hover: 0, down: 0, impulse: 0, energy: 0, fx: -999, fy: -999 };
       const onEnter = () => { mouse.hover = 1; };
@@ -200,17 +228,23 @@ export function ShaderObject({
           gl.uniform1f(loc("u_mouseHover"), mouse.hover);
           gl.clearColor(0, 0, 0, 0);
           gl.clear(gl.COLOR_BUFFER_BIT);
+          applyParams();
           gl.drawArrays(gl.TRIANGLES, 0, 6);
           last = now;
         } catch {
           running = false;
           return;
         }
-        if (!reduced.matches) frame = requestAnimationFrame(draw);
+        // Reduced motion: no idle loop, but keep drawing while visitor-set parameters are still easing.
+        if (!reduced.matches || !settled) frame = requestAnimationFrame(draw);
         else running = false;
       };
       const resume = () => {
         if (!running && !frame && !document.hidden && !lost) frame = requestAnimationFrame(draw);
+      };
+      if (params?.current) params.current.wake = () => {
+        settled = false;
+        resume();
       };
       const onVisibility = () => {
         if (document.hidden) {
@@ -291,7 +325,7 @@ export function ShaderObject({
       window.removeEventListener("load", schedule);
       teardown?.();
     };
-  }, [trackingRoot]);
+  }, [trackingRoot, params]);
 
   return (
     <canvas

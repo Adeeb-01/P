@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import { Navbar } from "@/components/Navbar";
 import { RouteTransition } from "@/components/RouteTransition";
-import { FramerBadge } from "@/components/FramerBadge";
+import { AvailabilityBadge } from "@/components/AvailabilityBadge";
 import { MotionProvider } from "@/components/motion/MotionProvider";
 import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { CustomCursor } from "@/components/motion/CustomCursor";
@@ -14,6 +14,7 @@ import { THEME_INIT_SCRIPT } from "@/lib/theme";
 import { PRELOADER_INIT_SCRIPT } from "@/lib/preloader";
 import { Preloader } from "@/components/transition/Preloader";
 import { ScrollTelemetry } from "@/components/telemetry/ScrollTelemetry";
+import { ParallaxController } from "@/components/motion/ParallaxController";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -31,9 +32,15 @@ const instrumentSans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Michael Carter — Digital Product Designer",
-  description:
-    "Michael Carter is a digital product designer focused on visual design and Framer websites, crafting seamless, user-centered experiences.",
+  title: "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer",
+  description: "Full-Stack MERN & Next.js developer based in Damascus, specializing in responsive interfaces, RESTful APIs, and RAG-driven intelligent platforms.",
+  authors: [{ name: "Mohammad Adeeb Alsaleh", url: "https://github.com/Adeeb-01" }],
+  openGraph: {
+    title: "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer",
+    description: "Full-Stack MERN & Next.js developer based in Damascus, specializing in responsive interfaces, RESTful APIs, and RAG-driven intelligent platforms.",
+    type: "website",
+    siteName: "Mohammad Adeeb Alsaleh",
+  },
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -51,13 +58,15 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Preloader />
           <ScrollProgress />
           <ScrollTelemetry />
+          <ParallaxController />
           <Navbar />
           <RouteTransition>{children}</RouteTransition>
-          <FramerBadge />
           <SpatialDock />
           <QuickJumpPalette />
           <SoundEngine />
           <Grain />
+          {/* After Grain: same z-40, so the badge paints above the texture. */}
+          <AvailabilityBadge />
           <CustomCursor />
         </MotionProvider>
       </body>

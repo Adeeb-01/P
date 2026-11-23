@@ -1,24 +1,22 @@
 "use client";
 
-/* eslint-disable @next/next/no-img-element -- 26px client marks mirror the original markup */
 import { useEffect, useState } from "react";
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import clsx from "clsx";
-import { SpotlightCard } from "@/components/motion/SpotlightCard";
-
-const IMG = "/assets/images/framerusercontent.com";
+import { RefractiveCard } from "@/components/motion/RefractiveCard";
 
 const reveal =
   "[transition:opacity_300ms_cubic-bezier(0.22,1,0.36,1),transform_300ms_cubic-bezier(0.22,1,0.36,1),visibility_0s_linear_300ms]";
 const revealOn =
   "hover-fine:group-hover/spot:visible hover-fine:group-hover/spot:opacity-100 hover-fine:group-hover/spot:[transform:translateY(0)] hover-fine:group-hover/spot:[transition-delay:0s] hover-fine:group-focus-visible/spot:visible hover-fine:group-focus-visible/spot:opacity-100 hover-fine:group-focus-visible/spot:[transform:translateY(0)] hover-fine:group-focus-visible/spot:[transition-delay:0s]";
 
-type Stat = { value: number; label: string; position: string; check: string; hidden: boolean };
+type Stat = { value: number; suffix: string; label: string; position: string; check: string; hidden: boolean };
 
 const STATS: Stat[] = [
   {
-    value: 10,
-    label: "happy clients",
+    value: 100,
+    suffix: "%",
+    label: "spec-driven delivery",
     hidden: true,
     position: clsx(
       "top-[116px] invisible opacity-0 [transform:translateY(-10px)]",
@@ -27,22 +25,22 @@ const STATS: Stat[] = [
     ),
     check: "bg-yellow text-ink",
   },
-  { value: 5, label: "years of experiences", hidden: true, position: clsx("top-[58px] invisible opacity-0 [transform:translateY(-8px)]", revealOn), check: "bg-green text-white" },
-  { value: 20, label: "projects completed", hidden: false, position: "top-0", check: "bg-purple text-white" },
+  { value: 15, suffix: "+", label: "core technologies", hidden: true, position: clsx("top-[58px] invisible opacity-0 [transform:translateY(-8px)]", revealOn), check: "bg-green text-white" },
+  { value: 10, suffix: "+", label: "full-stack & AI projects", hidden: false, position: "top-0", check: "bg-purple text-white" },
 ];
 
-const LOGOS = [
-  { src: `${IMG}/gBnkhJ17BmtTHqpLjPkAeWdN8U-502d59d6b6.png`, width: 771, height: 1024 },
-  { src: `${IMG}/zfmF1iFYDX2iAwx2tDdmHAHKsKY-476e700fc9.png`, width: 512, height: 512 },
-  { src: `${IMG}/7IFOWsHVY0RJFR1n6Chu0jDP1jA-21a60d831a.png`, width: 512, height: 512 },
-  { src: `${IMG}/nSJFnEeB2r1YM5Orpw7rRVinGQ-a8d64e4293.png`, width: 512, height: 512 },
+const CORE_STACK = [
+  { short: "Nx", name: "Next.js", tone: "bg-ink text-white" },
+  { short: "Re", name: "React", tone: "bg-[rgb(97,218,251)] text-ink" },
+  { short: "No", name: "Node.js", tone: "bg-[rgb(51,153,51)] text-white" },
+  { short: "Py", name: "Python", tone: "bg-[rgb(255,212,59)] text-ink" },
 ];
 
 /** Counts from 0 to `value` each time `run` increments (0 = show final value, no animation yet). */
-function Counter({ value, run }: { value: number; run: number }) {
+function Counter({ value, suffix, run }: { value: number; suffix: string; run: number }) {
   const reduced = useReducedMotion();
   const count = useMotionValue(value);
-  const display = useTransform(count, (latest) => `${Math.round(latest)}+`);
+  const display = useTransform(count, (latest) => `${Math.round(latest)}${suffix}`);
 
   useEffect(() => {
     if (run === 0 || reduced) return;
@@ -60,10 +58,10 @@ export function StatsCard() {
   const replayHidden = () => setRuns((current) => ({ ...current, hidden: current.hidden + 1 }));
 
   return (
-    <SpotlightCard
+    <RefractiveCard
       as="aside"
       tabIndex={0}
-      aria-label="Client and project statistics"
+      aria-label="Engineering statistics"
       onPointerEnter={replayHidden}
       onFocus={replayHidden}
       className="relative h-[450px] min-w-0 overflow-hidden rounded-5xl bg-surface max-md:w-full"
@@ -83,7 +81,7 @@ export function StatsCard() {
             )}
           >
             <p className="m-0 text-btn">
-              <Counter value={stat.value} run={stat.hidden ? runs.hidden : runs.visible} /> {stat.label}
+              <Counter value={stat.value} suffix={stat.suffix} run={stat.hidden ? runs.hidden : runs.visible} /> {stat.label}
             </p>
             <span aria-hidden="true" className={clsx("grid h-[18px] w-[18px] flex-none place-items-center rounded-full", stat.check)}>
               <svg viewBox="0 0 12 12" className="h-2.5 w-2.5">
@@ -101,22 +99,23 @@ export function StatsCard() {
           revealOn,
         )}
       >
-        <p className="m-0 text-[13px] leading-[18px] font-semibold tracking-[-0.48px] text-ink">Trusted by many</p>
+        <p className="m-0 text-[13px] leading-[18px] font-semibold tracking-[-0.48px] text-ink">Core stack</p>
         <div className="flex items-center">
-          <div className="flex w-[68px] flex-row-reverse items-center" aria-label="Trusted client marks">
-            {LOGOS.map((logo) => (
-              <img
-                key={logo.src}
-                src={logo.src}
-                width={logo.width}
-                height={logo.height}
-                alt=""
-                className="-ml-3 block h-[26px] w-[26px] flex-[0_0_26px] rounded-full border-2 border-green object-cover object-center"
-              />
-            ))}
-          </div>
+          <div className="flex flex-row-reverse items-center pl-3" role="list" aria-label="Core stack">
+              {[...CORE_STACK].reverse().map((tech) => (
+                <span
+                  key={tech.short}
+                  role="listitem"
+                  title={tech.name}
+                  aria-label={tech.name}
+                  className={clsx("-ml-3 grid h-[26px] w-[26px] flex-[0_0_26px] place-items-center rounded-full border-2 border-green text-[9px] font-semibold", tech.tone)}
+                >
+                  {tech.short}
+                </span>
+              ))}
+            </div>
         </div>
       </div>
-    </SpotlightCard>
+    </RefractiveCard>
   );
 }

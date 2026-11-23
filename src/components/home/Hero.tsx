@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { m, useScroll, useTransform, type Variants } from "motion/react";
 import clsx from "clsx";
 import { useMagnetic } from "@/components/motion/hooks";
-import { HeroAura } from "@/components/hero/HeroAura";
+import { Hero3DCore } from "@/components/hero/Hero3DCore";
 import { PortraitSheen } from "@/components/hero/PortraitSheen";
 import { Shine } from "@/components/motion/Shine";
 import { ProximityChar, ProximityProvider, useProximityField } from "@/components/motion/ProximityText";
@@ -15,7 +15,7 @@ const PORTRAIT = "/assets/images/framerusercontent.com/yHECzzvtCQT7X8sGipPGW5sEc
 const fade = "max-tab:transition-none motion-reduce:duration-[0.01ms]";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-const HEADLINE = ["Carter is solving problems", "through strategic design and", "compelling visuals"];
+const HEADLINE = ["Software Engineer building", "scalable full-stack apps and", "AI-powered systems."];
 const HEADLINE_LABEL = HEADLINE.join(" ");
 
 /** Words with a global character index (stable, computed once) for the proximity field. */
@@ -35,7 +35,7 @@ function EmailCta() {
   const magnetic = useMagnetic(0.35);
   return (
     <m.a
-      href="mailto:rosyidqoim@gmail.com"
+      href="mailto:adeeb2002alsalh@gmail.com"
       style={{ x: magnetic.x, y: magnetic.y }}
       onPointerMove={magnetic.onPointerMove}
       onPointerLeave={magnetic.onPointerLeave}
@@ -102,7 +102,7 @@ export function Hero() {
       className="relative h-screen scroll-mt-20 overflow-hidden bg-canvas max-xl:flex max-xl:h-auto max-xl:min-h-0 max-xl:flex-col max-xl:justify-start"
     >
       {/* Ambient violet glow floating behind the portrait. */}
-      <m.div aria-hidden="true" style={{ y: glowY }} className="pointer-events-none absolute inset-x-0 top-[6%] z-0 grid place-items-center max-xl:top-[34%]">
+      <m.div aria-hidden="true" style={{ y: glowY }} className="pointer-events-none absolute inset-x-0 top-[1%] z-0 grid place-items-center max-xl:top-[30%]">
         <m.div
           className="[grid-area:1/1] h-[min(720px,90vw)] w-[min(720px,90vw)] rounded-full bg-[radial-gradient(closest-side,rgba(116,48,247,0.16),rgba(116,48,247,0.05)_55%,transparent)]"
           initial={{ opacity: 0, scale: 0.85 }}
@@ -114,14 +114,14 @@ export function Hero() {
             y: { duration: 16, repeat: Infinity, ease: "easeInOut" },
           }}
         />
-        {/* WebGL liquid aura (pointer-reactive), layered over the CSS glow fallback. */}
+        {/* Raymarched liquid-glass ring (WebGL2) framing the portrait, over the CSS glow fallback. */}
         <m.div
           className="[grid-area:1/1]"
           initial={{ opacity: 0 }}
           animate={{ opacity: ready ? 1 : 0 }}
           transition={{ duration: 1.8, ease: EASE }}
         >
-          <HeroAura pointerRoot={heroRef} className="block h-[min(960px,120vw)] w-[min(1100px,130vw)]" />
+          <Hero3DCore pointerRoot={heroRef} className="block h-[min(780px,96vw)] w-[min(780px,96vw)]" />
         </m.div>
       </m.div>
 
@@ -137,7 +137,7 @@ export function Hero() {
         )}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- exact intrinsic sizing is required for pixel parity */}
-        <img ref={portraitRef} data-hero-portrait src={PORTRAIT} width={1242} height={986} alt="Michael Carter, Digital Product Designer" className="block h-full w-full" />
+        <img ref={portraitRef} data-hero-portrait src={PORTRAIT} width={1242} height={986} alt="Portrait (placeholder image)" className="block h-full w-full" />
         <PortraitSheen src={PORTRAIT} pointerRoot={heroRef} />
       </m.div>
 
@@ -167,7 +167,7 @@ export function Hero() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-green opacity-60 motion-reduce:animate-none" />
                 <span className="relative h-full w-full rounded-full bg-green" />
               </span>
-              <span>2 projects left in March</span>
+              <span>Available for Software &amp; AI Projects</span>
             </div>
             {/* Masked reveal: each word rises from behind its own clip; lines stagger on desktop. */}
             <ProximityProvider field={field}>
@@ -210,7 +210,7 @@ export function Hero() {
             )}
           >
             <p className="m-0 w-[400px] text-body font-normal text-fg-soft max-xl:w-full">
-              As a digital product designer with a strong focus on visual design and Framer websites, he collaborates closely with teams to craft seamless, user-centered experiences. A reliable partner in bringing ideas to life
+              Full-Stack MERN & Next.js developer based in Damascus, specializing in responsive interfaces, RESTful APIs, and RAG-driven intelligent platforms.
             </p>
             <EmailCta />
           </div>

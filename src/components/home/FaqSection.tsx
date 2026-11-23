@@ -7,7 +7,7 @@ export function FaqSection() {
     <section aria-labelledby="faq-title" data-telemetry="06 FAQ" className="w-full bg-canvas pt-14 pb-40 max-xl:py-[200px] max-md:pt-[100px]">
       <div className="mx-auto grid w-[min(1128px,calc(100%-80px))] grid-cols-[minmax(0,532px)_minmax(0,548px)] items-start gap-12 max-xl:grid-cols-1 max-xl:gap-[60px] max-md:w-[calc(100%-40px)]">
         <div className="pt-5 max-xl:pt-0">
-          <p className="m-0 flex items-center gap-4 text-btn font-medium text-muted after:h-px after:flex-auto after:bg-[rgb(231,232,233)] after:content-['']">
+          <p data-parallax-speed="0.06" className="m-0 flex items-center gap-4 text-btn font-medium text-muted after:h-px after:flex-auto after:bg-[rgb(231,232,233)] after:content-['']">
             <ScrambleText self text="FAQs" />
           </p>
           <h2
@@ -18,7 +18,7 @@ export function FaqSection() {
             the process and how we can work together
           </h2>
           <a
-            href="mailto:rosyidqoim@gmail.com"
+            href="mailto:adeeb2002alsalh@gmail.com"
             className="group/btn relative isolate mt-7 inline-flex h-12 overflow-hidden w-auto min-w-[108px] cursor-pointer items-center justify-center rounded-2xl border-0 bg-inverse px-6 py-3 text-btn-sm font-medium whitespace-nowrap text-on-inverse shadow-button transition-[background-color,box-shadow] duration-200 ease-out hover:bg-violet hover:text-white hover:shadow-violet active:bg-violet active:text-white active:shadow-violet active:scale-[0.97] max-xl:text-btn motion-reduce:transition-none"
           >
             <Shine />

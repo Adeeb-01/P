@@ -2,6 +2,7 @@
 
 import { useRef } from "react";
 import { m, useScroll, useSpring, useTransform } from "motion/react";
+import { useRefraction } from "@/components/motion/RefractiveCard";
 
 export type WorkflowStep = { key: string; title: string; description: string };
 
@@ -12,12 +13,15 @@ function StepCard({ step, index }: { step: WorkflowStep; index: number }) {
   const lit = useSpring(scrollYProgress, { stiffness: 200, damping: 30 });
   const cardOpacity = useTransform(lit, [0, 1], [0.45, 1]);
   const cardY = useTransform(lit, [0, 1], [28, 0]);
+  const refraction = useRefraction(ref, "dark");
 
   return (
     <m.article
       ref={ref}
       style={{ opacity: cardOpacity, y: cardY }}
-      className={`relative col-start-1 min-h-[226px] min-w-0 rounded-3xl border border-graphite bg-ink p-6 shadow-none hover-fine:transition-[border-color] hover-fine:duration-300 hover-fine:ease-out hover-fine:hover:border-[rgb(42,42,42)] xl:min-h-[236px] xl:w-[488px] xl:flex-none xl:bg-[rgb(20,20,20)] xl:p-[30px] ${index % 2 === 0 ? "xl:ml-[40%]" : "xl:ml-[59%]"}`}
+      onPointerMove={refraction.onPointerMove}
+      onPointerLeave={refraction.onPointerLeave}
+      className={`${refraction.rootClass} relative col-start-1 min-h-[226px] min-w-0 rounded-3xl border border-graphite bg-ink p-6 shadow-none hover-fine:transition-[border-color] hover-fine:duration-300 hover-fine:ease-out hover-fine:hover:border-[rgb(42,42,42)] xl:min-h-[236px] xl:w-[488px] xl:flex-none xl:bg-[rgb(20,20,20)] xl:p-[30px] ${index % 2 === 0 ? "xl:ml-[40%]" : "xl:ml-[59%]"}`}
     >
       {/* Violet ring fades in as the step activates. */}
       <m.span
@@ -37,6 +41,7 @@ function StepCard({ step, index }: { step: WorkflowStep; index: number }) {
       </span>
       <h3 className="m-0 mt-4 text-card font-medium text-white">{step.title}</h3>
       <p className="m-0 mt-1.5 max-w-[42ch] text-body font-normal text-slate xl:leading-[22px]">{step.description}</p>
+      {refraction.layers}
     </m.article>
   );
 }

@@ -14,8 +14,8 @@ import {
 } from "motion/react";
 import clsx from "clsx";
 
-const SKILLS_A = ["Branding Design", "Framer Development", "UI/UX Design", "Design Systems", "Prototyping", "Motion"];
-const SKILLS_B = ["Logo Design", "Landing Pages", "Web Migration", "Brand Strategy", "Multipage Sites", "Web & App Design"];
+const SKILLS_A = ["Next.js", "React.js", "Node.js", "TypeScript", "MongoDB", "Express.js", "Tailwind CSS"];
+const SKILLS_B = ["AI & LLMs", "RAG Systems", "VectorDB", "RESTful APIs", "System Design", "Python", "MySQL"];
 
 function Ribbon({ items, baseVelocity, outline }: { items: string[]; baseVelocity: number; outline?: boolean }) {
   const reduced = useReducedMotion();
