@@ -53,6 +53,7 @@ export function QuickJumpPalette() {
   const [query, setQuery] = useState("");
   const [active, setActive] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const restoreFocusAfterExit = useRef(false);
   const linkRefs = useRef<(HTMLAnchorElement | null)[]>([]);
   const lenis = useLenis();
   const listId = useId();
@@ -89,16 +90,19 @@ export function QuickJumpPalette() {
     if (!open) return;
     sound.whoosh();
     lenis?.stop();
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
     const id = requestAnimationFrame(() => inputRef.current?.focus());
     return () => {
       cancelAnimationFrame(id);
+      document.body.style.overflow = overflow;
       lenis?.start();
     };
   }, [open, lenis]);
 
   const close = (restoreFocus = true) => {
+    restoreFocusAfterExit.current = restoreFocus;
     quickJump.set(false);
-    if (restoreFocus) requestAnimationFrame(() => lastTrigger?.focus?.());
   };
 
   const onInputKey = (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -119,11 +123,14 @@ export function QuickJumpPalette() {
 
   return (
     <Portal>
-      <AnimatePresence>
+      <AnimatePresence onExitComplete={() => {
+        // The floating trigger becomes interactive again after the modal leaves the DOM.
+        if (restoreFocusAfterExit.current) requestAnimationFrame(() => requestAnimationFrame(() => lastTrigger?.focus?.()));
+      }}>
         {open && (
           <m.div
             key="palette"
-            className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[14vh]"
+            className="fixed inset-0 z-[80] flex items-start justify-center px-4 pt-[min(14vh,100px)] max-md:pt-[max(16px,env(safe-area-inset-top))]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, transition: { duration: 0.16 } }}
@@ -133,6 +140,15 @@ export function QuickJumpPalette() {
               role="dialog"
               aria-modal="true"
               aria-label="Jump to a case study"
+              onKeyDown={(event) => {
+                if (event.key === "Escape") { event.preventDefault(); close(); }
+                if (event.key === "Tab") {
+                  const targets = Array.from(event.currentTarget.querySelectorAll<HTMLElement>('input,button,[tabindex="0"]'));
+                  const index = targets.indexOf(document.activeElement as HTMLElement);
+                  event.preventDefault();
+                  targets[(index + (event.shiftKey ? -1 : 1) + targets.length) % targets.length]?.focus();
+                }
+              }}
               data-lenis-prevent
               initial={{ y: 18, scale: 0.97, opacity: 0 }}
               animate={{ y: 0, scale: 1, opacity: 1 }}
@@ -159,12 +175,12 @@ export function QuickJumpPalette() {
                   }}
                   onKeyDown={onInputKey}
                   placeholder="Search projects, stack, topics…"
-                  className="h-16 w-full border-0 bg-transparent text-[18px] tracking-[-0.36px] text-fg outline-none placeholder:text-muted"
+                  className="h-16 min-w-0 w-full border-0 bg-transparent text-[16px] tracking-[-0.36px] text-fg outline-none placeholder:text-muted"
                 />
-                <kbd className="rounded-lg border border-line bg-surface px-2 py-1 font-sans text-[11px] leading-none text-muted">Esc</kbd>
+                <button type="button" aria-label="Close search" onClick={() => close()} className="grid h-11 w-11 flex-none place-items-center rounded-xl border border-line bg-surface text-muted">×</button>
               </div>
 
-              <ul id={listId} role="listbox" aria-label="Case studies" className="m-0 max-h-[50vh] list-none overflow-y-auto p-2">
+              <ul id={listId} role="listbox" aria-label="Case studies" className="m-0 max-h-[min(50dvh,400px)] list-none overflow-y-auto p-2">
                 {results.length === 0 && <li className="px-4 py-8 text-center text-body text-muted">No projects match “{query}”.</li>}
                 {results.map((project, index) => (
                   <li key={project.slug} id={`${listId}-${project.slug}`} role="option" aria-selected={index === active}>

@@ -4,6 +4,7 @@ import { useRef, useState, useSyncExternalStore, type KeyboardEvent, type Pointe
 import { m, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
 import clsx from "clsx";
 import { ProjectCard } from "@/components/ProjectCard";
+import { TouchDeck } from "./TouchDeck";
 import { VelocitySkew } from "@/components/motion/VelocitySkew";
 import { ClipReveal } from "@/components/motion/ClipReveal";
 import { useLenis } from "@/components/motion/SmoothScroll";
@@ -157,14 +158,14 @@ export function SpatialShowcase({ projects }: { projects: Project[] }) {
   const wide = useWide();
   const fine = useFinePointer();
   const reduced = usePrefersReducedMotion();
-  const spatialAllowed = wide && fine && !reduced;
+  const desktopTrack = wide && fine && !reduced;
   const [chosen, setChosen] = useState<View | null>(null);
   const stored = useSyncExternalStore(
     () => () => {},
     () => readStoredView(),
     () => null,
   );
-  const view: View = spatialAllowed ? (chosen ?? stored ?? "track") : "grid";
+  const view: View = chosen ?? stored ?? (reduced ? "grid" : "track");
 
   const choose = (next: View) => {
     setChosen(next);
@@ -177,8 +178,8 @@ export function SpatialShowcase({ projects }: { projects: Project[] }) {
 
   return (
     <>
-      {spatialAllowed && (
-        <div className="mx-auto mb-10 flex w-[min(1120px,calc(100%-80px))] items-center justify-between">
+      {(
+        <div className="mx-auto mb-6 flex w-[min(1120px,calc(100%-40px))] flex-wrap items-center justify-between gap-3">
           <div role="radiogroup" aria-label="Works layout" className="relative flex rounded-full border border-line/70 bg-surface p-1">
             {(["track", "grid"] as const).map((option) => (
               <button
@@ -187,22 +188,22 @@ export function SpatialShowcase({ projects }: { projects: Project[] }) {
                 role="radio"
                 aria-checked={view === option}
                 onClick={() => choose(option)}
-                className={clsx("relative isolate cursor-pointer rounded-full border-0 bg-transparent px-4 py-2 text-small font-medium transition-colors", view === option ? "text-on-inverse" : "text-fg-soft hover:text-fg")}
+                className={clsx("relative isolate min-h-11 cursor-pointer rounded-full border-0 bg-transparent px-4 py-2 text-small font-medium transition-colors", view === option ? "text-on-inverse" : "text-fg-soft hover:text-fg")}
               >
                 {view === option && <m.span layoutId="works-view-pill" className="absolute inset-0 -z-[1] rounded-full bg-inverse" transition={{ type: "spring", stiffness: 420, damping: 34 }} />}
-                {option === "track" ? "Spatial track" : "Editorial grid"}
+                {option === "track" ? desktopTrack ? "Spatial track" : reduced ? "Snap Deck" : "3D Deck" : "Grid"}
               </button>
             ))}
           </div>
-          {view === "track" && <span className="text-credit text-muted">Scroll or use ← → to travel</span>}
+          {view === "track" && <span className="text-credit text-muted">{desktopTrack ? "Scroll or use ← → to travel" : "Swipe to explore"}</span>}
         </div>
       )}
 
       {view === "track" ? (
-        <SpatialTrack projects={projects} />
+        desktopTrack ? <SpatialTrack projects={projects} /> : <TouchDeck projects={projects} />
       ) : (
         <div className="mx-auto w-[min(1120px,calc(100%-80px))] max-md:w-[calc(100%-40px)]">
-          <VelocitySkew className="grid grid-cols-2 gap-3 pb-20 max-xl:grid-cols-1 max-md:pb-0">
+          <VelocitySkew className="grid grid-cols-2 gap-4 pb-20 max-[767.98px]:grid-cols-1 max-md:pb-0">
             {projects.map((project, index) => (
               <ClipReveal key={project.slug} delay={(index % 2) * 0.08}>
                 <ProjectCard project={project} variant="gallery" />

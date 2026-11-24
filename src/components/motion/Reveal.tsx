@@ -1,6 +1,7 @@
 "use client";
 
 import { m } from "motion/react";
+import { usePrefersReducedMotion } from "./hooks";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -19,13 +20,14 @@ export function Reveal({
   as?: "div" | "li" | "article" | "header";
 }) {
   const Component = m[as];
+  const reduced = usePrefersReducedMotion();
   return (
     <Component
       className={className}
-      initial={{ opacity: 0, y }}
+      initial={reduced ? false : { opacity: 0, y }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "0px 0px -12% 0px" }}
-      transition={{ duration: 0.8, ease: EASE, delay }}
+      transition={{ duration: reduced ? 0 : 0.8, ease: EASE, delay: reduced ? 0 : delay }}
     >
       {children}
     </Component>

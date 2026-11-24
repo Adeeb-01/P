@@ -55,7 +55,7 @@ function PillSlider({ label, value, format, onChange }: { label: string; value: 
       onPointerMove={(event) => {
         if (event.currentTarget.hasPointerCapture(event.pointerId)) fromPointer(event);
       }}
-      className="relative h-9 w-[112px] cursor-ew-resize touch-none overflow-hidden rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-md select-none focus-visible:outline-offset-2"
+      className="relative h-11 w-[112px] cursor-ew-resize touch-none overflow-hidden rounded-full border border-white/15 bg-white/[0.06] backdrop-blur-md select-none focus-visible:outline-offset-2"
     >
       <span aria-hidden="true" style={{ transform: `scaleX(${value / 100})` }} className="absolute inset-0 origin-left bg-[linear-gradient(90deg,rgba(116,48,247,0.55),rgba(178,140,255,0.45))] transition-transform duration-150 ease-out" />
       <span aria-hidden="true" className="relative flex h-full items-center justify-between px-3 text-[11px] font-medium tracking-[0.02em] text-white">
@@ -69,7 +69,7 @@ function PillSlider({ label, value, format, onChange }: { label: string; value: 
 /**
  * Interactive shader lab: the WebGL orb plus three glass pill sliders (Distortion, Flow, Hue) and a
  * Reset, mapped onto ShaderObject's existing uniforms with smooth per-frame easing.
- * Hidden at ≤640px, where the orb is a static image.
+ * Touch controls remain available at every viewport size.
  */
 export function ShaderLab({ orbClassName }: { orbClassName?: string }) {
   const [values, setValues] = useState<Record<Key, number>>(DEFAULTS);
@@ -94,7 +94,7 @@ export function ShaderLab({ orbClassName }: { orbClassName?: string }) {
   return (
     <div className="flex flex-col items-center gap-5">
       <ShaderOrb className={orbClassName} params={params} />
-      <div role="group" aria-label="Shader controls" className="flex flex-wrap items-center justify-center gap-2 max-[640.98px]:hidden">
+      <div role="group" aria-label="Shader controls" className="grid grid-cols-2 items-center justify-items-center gap-2 min-[640px]:flex min-[640px]:flex-wrap min-[640px]:justify-center">
         {CONTROLS.map((control) => (
           <PillSlider key={control.key} label={control.label} value={values[control.key]} format={control.format} onChange={(value) => update(control.key, value)} />
         ))}
@@ -104,7 +104,7 @@ export function ShaderLab({ orbClassName }: { orbClassName?: string }) {
           disabled={!dirty}
           aria-label="Reset shader"
           className={clsx(
-            "grid h-9 w-9 cursor-pointer place-items-center rounded-full border border-white/15 bg-white/[0.06] text-white backdrop-blur-md transition-opacity active:scale-95 disabled:cursor-default disabled:opacity-35",
+            "grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-white/15 bg-white/[0.06] text-white backdrop-blur-md transition-opacity active:scale-95 disabled:cursor-default disabled:opacity-35",
           )}
         >
           <svg viewBox="0 0 20 20" aria-hidden="true" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">

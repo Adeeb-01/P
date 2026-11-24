@@ -10,11 +10,11 @@ import { EditorialSplit } from "@/components/motion/EditorialSplit";
 /** Dark closing environment: shader object, final CTA, and the site footer. Shared by every route. */
 export function ClosingSection() {
   return (
-    <ClosingStage className="relative isolate w-full overflow-hidden rounded-t-5xl bg-ink bg-[url('/assets/images/framerusercontent.com/WjZVYjfVNTdo9UKicX5AdploJGc-a96cff631d.webp')] bg-cover bg-center pt-[176px] pb-[72px] text-white max-xl:pt-[120px] max-xl:pb-[60px] max-tab:pt-[100px] max-[640.98px]:rounded-t-[28px] max-[640.98px]:pt-20 max-[640.98px]:pb-10">
+    <ClosingStage className="closing-section relative isolate w-full overflow-hidden rounded-t-5xl bg-ink bg-[url('/assets/images/framerusercontent.com/WjZVYjfVNTdo9UKicX5AdploJGc-a96cff631d.webp')] bg-cover bg-center pt-[176px] pb-[72px] text-white max-xl:pt-[120px] max-xl:pb-[60px] max-tab:pt-[100px] max-[640.98px]:rounded-t-[28px] max-[640.98px]:pt-20 max-[640.98px]:pb-10">
       <ParticleField />
       <section aria-labelledby="closing-cta-title" className="w-full bg-transparent p-0">
         <div className="mx-auto flex w-[min(400px,calc(100%-80px))] flex-col items-center gap-8 text-center max-md:w-[min(400px,calc(100%-40px))]">
-          <ShaderLab orbClassName="h-[168px] w-[168px] max-xl:h-[180px] max-xl:w-[180px] max-[640.98px]:h-[160px] max-[640.98px]:w-[140px] max-[640.98px]:[content:url('/assets/images/luzia-purple-shader-object-mobile.png')]" />
+          <ShaderLab orbClassName="h-[168px] w-[168px] max-xl:h-[180px] max-xl:w-[180px] max-md:h-[160px] max-md:w-[160px]" />
           <EditorialSplit
             id="closing-cta-title"
             segments={[{ text: "Have a project in mind?", className: "text-muted" }, { text: "Let's build it together." }]}

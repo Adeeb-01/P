@@ -49,7 +49,7 @@ export function EditorialSplit({
                 className={clsx("inline-block origin-[50%_100%] will-change-transform", word.className)}
                 initial={reduced ? false : { rotateX: -80, opacity: 0, y: "0.2em" }}
                 animate={reduced || inView ? { rotateX: 0, opacity: 1, y: "0em" } : undefined}
-                transition={{ duration: 0.9, ease: EASE, delay: delay + index * stagger }}
+                transition={reduced ? { duration: 0 } : { duration: 0.9, ease: EASE, delay: delay + index * stagger }}
               >
                 {word.text}
               </m.span>

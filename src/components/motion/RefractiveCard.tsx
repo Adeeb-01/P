@@ -1,9 +1,9 @@
 "use client";
 
-import { useRef, type PointerEvent, type RefObject } from "react";
+import { useEffect, useRef, type PointerEvent, type RefObject } from "react";
 import { useMotionValue, useMotionValueEvent, useSpring } from "motion/react";
 import clsx from "clsx";
-import { useCachedRect, usePointerEffects } from "@/components/motion/hooks";
+import { useCachedRect, useFinePointer, usePrefersReducedMotion } from "@/components/motion/hooks";
 
 export type RefractionTone = "light" | "dark";
 
@@ -28,12 +28,42 @@ const RIM: Record<RefractionTone, string> = {
  * variables so pointer movement never re-renders React.
  */
 export function useRefraction(ref: RefObject<HTMLElement | null>, tone: RefractionTone = "light") {
-  const enabled = usePointerEffects();
+  const enabled = !usePrefersReducedMotion();
+  const fine = useFinePointer();
   const { measure, reset } = useCachedRect();
   const target = useMotionValue(0);
   const angle = useSpring(target, { stiffness: 170, damping: 22, mass: 0.6 });
   const unwrapped = useRef(0);
   const previous = useRef<number | null>(null);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || !enabled || fine) return;
+    let visible = false;
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      if (!visible || document.hidden) return;
+      const rect = element.getBoundingClientRect();
+      const progress = Math.max(0, Math.min(1, (innerHeight - rect.top) / (innerHeight + rect.height)));
+      target.set(progress * 300 - 60);
+      element.style.setProperty("--spot-y", `${progress * 100}%`);
+      element.style.setProperty("--rim-strength", "0.5");
+    };
+    const schedule = () => { if (visible && !frame) frame = requestAnimationFrame(update); };
+    const observer = new IntersectionObserver(([entry]) => { visible = entry.isIntersecting; schedule(); });
+    observer.observe(element);
+    const tap = () => { target.set(target.get() + 65); element.style.setProperty("--rim-strength", "1"); };
+    element.addEventListener("pointerdown", tap, { passive: true });
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      observer.disconnect(); cancelAnimationFrame(frame);
+      element.removeEventListener("pointerdown", tap);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
+  }, [enabled, fine, ref, target]);
 
   useMotionValueEvent(angle, "change", (value) => {
     ref.current?.style.setProperty("--rim-angle", `${value.toFixed(2)}deg`);
@@ -71,8 +101,8 @@ export function useRefraction(ref: RefObject<HTMLElement | null>, tone: Refracti
 
   const layers = enabled ? (
     <>
-      <span aria-hidden="true" className={clsx("pointer-events-none absolute inset-0 z-[3] rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover/spot:opacity-100", FILL[tone])} />
-      <span aria-hidden="true" className="pointer-events-none absolute inset-0 z-[3] rounded-[inherit] opacity-0 transition-opacity duration-500 group-hover/spot:opacity-100">
+      <span aria-hidden="true" className={clsx("pointer-events-none absolute inset-0 z-[3] rounded-[inherit] transition-opacity duration-500", fine ? "opacity-0 group-hover/spot:opacity-100" : "opacity-60", FILL[tone])} />
+      <span aria-hidden="true" className={clsx("pointer-events-none absolute inset-0 z-[3] rounded-[inherit] transition-opacity duration-500", fine ? "opacity-0 group-hover/spot:opacity-100" : "opacity-70")}>
         <span
           className={clsx(
             "absolute inset-0 rounded-[inherit] p-px [opacity:var(--rim-strength,0.6)] [mask:linear-gradient(#000_0_0)_content-box_exclude,linear-gradient(#000_0_0)]",

@@ -13,6 +13,13 @@ function subscribeQuery(query: string) {
     return () => list.removeEventListener("change", callback);
   };
 }
+const MOBILE_GPU = "(max-width: 1199.98px), (pointer: coarse)";
+const subscribeMobileGpu = subscribeQuery(MOBILE_GPU);
+
+/** Rendering quality follows viewport/input capability, independently of motion preferences. */
+export function useMobileGpu() {
+  return useSyncExternalStore(subscribeMobileGpu, () => window.matchMedia(MOBILE_GPU).matches, () => true);
+}
 const subscribeReducedMotion = subscribeQuery(REDUCED_MOTION);
 
 /**

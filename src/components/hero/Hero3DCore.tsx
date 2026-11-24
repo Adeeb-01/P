@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
-import { usePrefersReducedMotion } from "@/components/motion/hooks";
+import { useEffect, useRef, useState, type RefObject } from "react";
+import { useMobileGpu, usePrefersReducedMotion } from "@/components/motion/hooks";
+import { renderQuality } from "@/lib/render-quality";
 
 const VERTEX = `#version 300 es
 in vec2 p;
@@ -121,8 +122,6 @@ void main(){
   outColor = vec4(col * alpha, alpha);
 }`;
 
-const DPR_CAP = 1.5;
-const FRAME_BUDGET_MS = 18;
 
 /**
  * Real-time raymarched liquid-glass ring framing the hero portrait (WebGL2, no dependencies).
@@ -133,6 +132,8 @@ const FRAME_BUDGET_MS = 18;
 export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<HTMLElement | null>; className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const reduced = usePrefersReducedMotion();
+  const mobile = useMobileGpu();
+  const [generation, setGeneration] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -147,7 +148,7 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
       return shader;
     };
     const vs = compile(gl.VERTEX_SHADER, VERTEX);
-    const fs = compile(gl.FRAGMENT_SHADER, FRAGMENT);
+    const fs = compile(gl.FRAGMENT_SHADER, mobile ? FRAGMENT.replace("i < 64", "i < 36").replace("i < 3;", "i < 2;") : FRAGMENT);
     const program = gl.createProgram()!;
     gl.attachShader(program, vs);
     gl.attachShader(program, fs);
@@ -169,11 +170,9 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
     const u = Object.fromEntries(["uRes", "uTime", "uRot", "uPulse", "uWobble", "uDark"].map((name) => [name, gl.getUniformLocation(program, name)]));
 
     // ── Adaptive resolution ──
-    let quality = 0.75;
-    let frameAvg = 16;
-    let fastFrames = 0;
+    const quality = renderQuality(mobile);
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP) * quality;
+      const dpr = quality.dpr;
       const width = Math.max(1, Math.round(canvas.clientWidth * dpr));
       const height = Math.max(1, Math.round(canvas.clientHeight * dpr));
       if (canvas.width !== width || canvas.height !== height) {
@@ -199,7 +198,8 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
       state.tx = 0;
       state.ty = 0;
     };
-    const onDown = () => {
+    const onDown = (event: PointerEvent) => {
+      onMove(event);
       state.pulse = 1;
       kick();
     };
@@ -216,7 +216,7 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
     };
 
     let frame = 0;
-    let visible = true;
+    let visible = false;
     let last = performance.now();
     const start = last;
     const readDark = () => (document.documentElement.dataset.theme === "dark" ? 1 : 0);
@@ -234,27 +234,17 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
       gl.uniform1f(u.uWobble, state.wobble);
       gl.uniform1f(u.uDark, state.dark);
       gl.drawArrays(gl.TRIANGLES, 0, 3);
+      canvas.dataset.rendered = "true";
     };
 
     const tick = (now: number) => {
       frame = 0;
-      if (!visible || document.hidden) return;
+      if (!visible || document.hidden || gl.isContextLost()) return;
       const dt = Math.min((now - last) / 1000, 0.05);
       const frameMs = now - last;
       last = now;
 
-      // Frame-time budget: step resolution down quickly, back up slowly.
-      frameAvg = frameAvg * 0.9 + frameMs * 0.1;
-      if (frameAvg > FRAME_BUDGET_MS && quality > 0.45) {
-        quality = Math.max(0.45, quality * 0.85);
-        frameAvg = 16;
-      } else if (frameAvg < 12) {
-        fastFrames += 1;
-        if (fastFrames > 90 && quality < 1) {
-          quality = Math.min(1, quality * 1.06);
-          fastFrames = 0;
-        }
-      } else fastFrames = 0;
+      quality.sample(frameMs);
 
       // Critically damped springs for rotation; exponential decay for pulse / wobble.
       const k = 38;
@@ -274,7 +264,7 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
     };
     const kick = () => {
       if (reduced) return;
-      if (!frame && visible && !document.hidden) {
+      if (!frame && visible && !document.hidden && !gl.isContextLost()) {
         last = performance.now();
         frame = requestAnimationFrame(tick);
       }
@@ -303,19 +293,26 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
 
     if (reduced) {
       // Static high-res frame: full quality, fixed time.
-      quality = 1;
       render(4.0);
     } else {
       root?.addEventListener("pointermove", onMove);
       root?.addEventListener("pointerleave", onLeave);
       root?.addEventListener("pointerdown", onDown);
+      root?.addEventListener("pointercancel", onLeave);
+      root?.addEventListener("pointerup", onLeave);
       window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", invalidate);
       document.addEventListener("visibilitychange", kick);
       kick();
     }
 
+    const onLost = (event: Event) => { event.preventDefault(); cancelAnimationFrame(frame); frame = 0; };
+    const onRestored = () => setGeneration((value) => value + 1);
+    canvas.addEventListener("webglcontextlost", onLost);
+    canvas.addEventListener("webglcontextrestored", onRestored);
     return () => {
+      canvas.removeEventListener("webglcontextlost", onLost);
+      canvas.removeEventListener("webglcontextrestored", onRestored);
       if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
       resizeObserver.disconnect();
@@ -323,6 +320,8 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
       root?.removeEventListener("pointermove", onMove);
       root?.removeEventListener("pointerleave", onLeave);
       root?.removeEventListener("pointerdown", onDown);
+      root?.removeEventListener("pointercancel", onLeave);
+      root?.removeEventListener("pointerup", onLeave);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", invalidate);
       document.removeEventListener("visibilitychange", kick);
@@ -331,11 +330,9 @@ export function Hero3DCore({ pointerRoot, className }: { pointerRoot: RefObject<
       gl.deleteProgram(program);
       gl.deleteShader(vs);
       gl.deleteShader(fs);
-      gl.getExtension("WEBGL_lose_context")?.loseContext();
     };
-  }, [pointerRoot, reduced]);
+  }, [pointerRoot, reduced, mobile, generation]);
 
-  // Keyed by mode: a context released with loseContext() cannot be reused, so switching between
-  // live and static rendering (e.g. reduced motion resolving after hydration) mounts a fresh canvas.
-  return <canvas key={reduced ? "static" : "live"} ref={canvasRef} aria-hidden="true" data-hero-core className={className} />;
+  // Rebuild all resources when quality mode changes or the browser restores a lost context.
+  return <canvas key={`${reduced}-${mobile}-${generation}`} ref={canvasRef} aria-hidden="true" data-hero-core data-raymarch-steps={mobile ? 36 : 64} className={className} />;
 }

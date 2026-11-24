@@ -10,15 +10,18 @@ import {
   useSpring,
   useTransform,
   useVelocity,
+  useInView,
   wrap,
 } from "motion/react";
 import clsx from "clsx";
 
-const SKILLS_A = ["Next.js", "React.js", "Node.js", "TypeScript", "MongoDB", "Express.js", "Tailwind CSS"];
-const SKILLS_B = ["AI & LLMs", "RAG Systems", "VectorDB", "RESTful APIs", "System Design", "Python", "MySQL"];
+const SKILLS_A = ["Next.js", "React.js", "Flutter", "React Native", "Node.js", "TypeScript", "MongoDB", "Express.js", "Tailwind CSS"];
+const SKILLS_B = ["AI & RAG", "AI & LLMs", "RAG Systems", "VectorDB", "SQLite", "Firebase", "RESTful APIs", "System Design", "Python", "MySQL"];
 
 function Ribbon({ items, baseVelocity, outline }: { items: string[]; baseVelocity: number; outline?: boolean }) {
   const reduced = useReducedMotion();
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { margin: "100px" });
   const baseX = useMotionValue(0);
   const { scrollY } = useScroll();
   const scrollVelocity = useVelocity(scrollY);
@@ -29,9 +32,9 @@ function Ribbon({ items, baseVelocity, outline }: { items: string[]; baseVelocit
   const x = useTransform(baseX, (value) => `${wrap(-25, -50, value)}%`);
 
   useAnimationFrame((_, delta) => {
-    if (reduced) return;
-    let moveBy = direction.current * baseVelocity * (delta / 1000);
-    const factor = velocityFactor.get();
+    if (reduced || !inView || document.hidden) return;
+    let moveBy = direction.current * baseVelocity * (Math.min(delta, 40) / 1000);
+    const factor = Math.max(-3, Math.min(3, velocityFactor.get()));
     if (factor < 0) direction.current = -1;
     else if (factor > 0) direction.current = 1;
     moveBy += moveBy * Math.abs(factor);
@@ -39,7 +42,7 @@ function Ribbon({ items, baseVelocity, outline }: { items: string[]; baseVelocit
   });
 
   return (
-    <div className="flex overflow-hidden whitespace-nowrap">
+    <div ref={ref} className="flex overflow-hidden whitespace-nowrap">
       <m.div style={{ x }} className="flex flex-none will-change-transform">
         {[0, 1, 2, 3].map((copy) => (
           <span key={copy} className="flex flex-none items-center" aria-hidden={copy > 0 ? true : undefined}>

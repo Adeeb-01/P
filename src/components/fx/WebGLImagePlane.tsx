@@ -3,7 +3,7 @@
 import { useEffect, useRef, type RefObject } from "react";
 import clsx from "clsx";
 import { imageFx } from "@/lib/image-fx";
-import { usePointerEffects } from "@/components/motion/hooks";
+import { useMobileGpu, usePrefersReducedMotion } from "@/components/motion/hooks";
 
 const DPR_CAP = 1.5;
 const IDLE = 0.008;
@@ -12,11 +12,12 @@ const IDLE = 0.008;
  * Liquid ripple + chromatic aberration over a project image, driven by pointer and scroll velocity.
  * Rendering goes through the single shared WebGL context (lib/image-fx) into this 2D canvas, only
  * while the effect has energy; at rest the canvas fades out and the crisp <img> underneath shows.
- * Not rendered at all for touch devices or reduced motion.
+ * Touch impulses and native scroll velocity share the same bounded energy budget.
  */
 export function WebGLImagePlane({ src, hostRef, className }: { src: string; hostRef: RefObject<HTMLElement | null>; className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const enabled = usePointerEffects();
+  const enabled = !usePrefersReducedMotion();
+  const mobile = useMobileGpu();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -31,6 +32,8 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
     let visible = false;
     let frame = 0;
     let active = false;
+    let disposed = false;
+    let lastFrame = performance.now();
     let energy = 0;
     let scroll = 0;
     let scrollTarget = 0;
@@ -39,7 +42,7 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
     let rect: DOMRect | null = null;
 
     const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, DPR_CAP);
+      const dpr = mobile ? 0.75 : Math.min(window.devicePixelRatio || 1, DPR_CAP);
       canvas.width = Math.max(1, Math.round(canvas.clientWidth * dpr));
       canvas.height = Math.max(1, Math.round(canvas.clientHeight * dpr));
     };
@@ -59,9 +62,11 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
         stop();
         return;
       }
-      energy *= 0.94;
+      const dt = Math.min(50, now - lastFrame) / 16.667;
+      lastFrame = now;
+      energy *= Math.pow(0.94, dt);
       scroll += (scrollTarget - scroll) * 0.15;
-      scrollTarget *= 0.86;
+      scrollTarget *= Math.pow(0.86, dt);
       if (energy + scroll < IDLE) {
         stop();
         return;
@@ -75,6 +80,12 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
         mouseX: mouse.x,
         mouseY: mouse.y,
       });
+      if (!drawn) {
+        stop();
+        entry = null;
+        ensureTexture();
+        return;
+      }
       if (drawn && !active) {
         active = true;
         canvas.style.opacity = "1";
@@ -82,15 +93,17 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
       frame = requestAnimationFrame(tick);
     };
     const kick = () => {
-      if (!frame && visible && entry) frame = requestAnimationFrame(tick);
+      if (!frame && visible && entry && !document.hidden && !disposed) { lastFrame = performance.now(); frame = requestAnimationFrame(tick); }
     };
 
     const ensureTexture = () => {
       if (entry || loading) return;
       loading = true;
       void fx.load(src).then((result) => {
+        if (disposed) return;
         entry = result;
         loading = false;
+        if (energy + scrollTarget > IDLE) kick();
       });
     };
 
@@ -115,6 +128,13 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
       rect = null;
       mouse.lastX = -1;
     };
+    const onDown = (event: PointerEvent) => {
+      onMove(event);
+      energy = 0.7;
+      ensureTexture();
+      kick();
+    };
+    const onVisibility = () => { if (document.hidden) stop(); else kick(); };
 
     let lastScrollY = window.scrollY;
     let lastScrollT = performance.now();
@@ -142,20 +162,25 @@ export function WebGLImagePlane({ src, hostRef, className }: { src: string; host
     });
     intersection.observe(canvas);
     host.addEventListener("pointermove", onMove);
+    host.addEventListener("pointerdown", onDown, { passive: true });
     host.addEventListener("pointerleave", onLeave);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", onVisibility);
 
     return () => {
+      disposed = true;
       stop();
       resizeObserver.disconnect();
       intersection.disconnect();
       host.removeEventListener("pointermove", onMove);
+      host.removeEventListener("pointerdown", onDown);
       host.removeEventListener("pointerleave", onLeave);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [enabled, hostRef, src]);
+  }, [enabled, hostRef, src, mobile]);
 
   if (!enabled) return null;
   return (

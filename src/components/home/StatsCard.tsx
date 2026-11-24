@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { animate, m, useMotionValue, useReducedMotion, useTransform } from "motion/react";
 import clsx from "clsx";
 import { RefractiveCard } from "@/components/motion/RefractiveCard";
+import { useFinePointer } from "@/components/motion/hooks";
 
 const reveal =
   "[transition:opacity_300ms_cubic-bezier(0.22,1,0.36,1),transform_300ms_cubic-bezier(0.22,1,0.36,1),visibility_0s_linear_300ms]";
@@ -53,6 +54,7 @@ function Counter({ value, suffix, run }: { value: number; suffix: string; run: n
 }
 
 export function StatsCard() {
+  const fine = useFinePointer();
   // Visible counter plays once on entering the viewport; the hidden stack replays on every reveal.
   const [runs, setRuns] = useState({ visible: 0, hidden: 0 });
   const replayHidden = () => setRuns((current) => ({ ...current, hidden: current.hidden + 1 }));
@@ -64,12 +66,14 @@ export function StatsCard() {
       aria-label="Engineering statistics"
       onPointerEnter={replayHidden}
       onFocus={replayHidden}
-      className="relative h-[450px] min-w-0 overflow-hidden rounded-5xl bg-surface max-md:w-full"
+      onPointerDown={replayHidden}
+      data-touch-stats={!fine || undefined}
+      className="stats-card relative h-[450px] min-w-0 overflow-hidden rounded-5xl bg-surface max-md:w-full"
     >
       <m.div
         className="absolute top-16 right-6 left-6 h-[166px]"
         viewport={{ once: true, margin: "0px 0px -15% 0px" }}
-        onViewportEnter={() => setRuns((current) => ({ ...current, visible: current.visible + 1 }))}
+        onViewportEnter={() => setRuns((current) => ({ visible: current.visible + 1, hidden: current.hidden + 1 }))}
       >
         {STATS.map((stat) => (
           <div
@@ -78,6 +82,7 @@ export function StatsCard() {
               "absolute inset-x-0 flex min-h-[52px] items-center justify-between gap-3 rounded-2xl bg-elevated py-3 pr-3.5 pl-4 text-fg-soft shadow-stat",
               reveal,
               stat.position,
+              !fine && "visible! opacity-100! transform-none!",
             )}
           >
             <p className="m-0 text-btn">
@@ -97,6 +102,7 @@ export function StatsCard() {
           "pointer-events-none invisible absolute top-[18px] right-[18px] left-auto flex h-[38px] w-max flex-row-reverse items-center gap-[9px] rounded-[999px] bg-green py-1 pr-3 pl-[5px] opacity-0 shadow-trusted [transform:translateY(6px)]",
           reveal,
           revealOn,
+          !fine && "visible! opacity-100! transform-none!",
         )}
       >
         <p className="m-0 text-[13px] leading-[18px] font-semibold tracking-[-0.48px] text-ink">Core stack</p>

@@ -129,9 +129,11 @@ export function Navbar() {
 
   // Freeze page scrolling behind the open drawer.
   useEffect(() => {
-    if (!lenis) return;
-    if (open) lenis.stop();
-    else lenis.start();
+    if (!open) return;
+    const overflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    lenis?.stop();
+    return () => { document.body.style.overflow = overflow; lenis?.start(); };
   }, [open, lenis]);
 
   const floating = scrolled;
@@ -181,7 +183,7 @@ export function Navbar() {
             <CtaButton className="w-[135.172px] min-w-[135.172px] shadow-button-sm" />
           </m.div>
 
-          <m.div layout="position" transition={SHELL_SPRING} className="mr-1 hidden items-center max-xl:flex">
+          <m.div layout="position" transition={SHELL_SPRING} className="mr-1 hidden items-center max-xl:flex max-md:hidden">
             <SoundToggle />
             <ThemeToggle />
           </m.div>

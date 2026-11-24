@@ -43,13 +43,14 @@ export function ParticleField() {
     let rect: DOMRect | null = null;
 
     const seed = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const mobile = window.matchMedia("(max-width: 1199px), (pointer: coarse)").matches;
+      const dpr = mobile ? 0.75 : Math.min(window.devicePixelRatio || 1, 2);
       width = canvas.clientWidth;
       height = canvas.clientHeight;
       canvas.width = Math.round(width * dpr);
       canvas.height = Math.round(height * dpr);
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
-      count = Math.round(Math.max(40, Math.min(110, (width * height) / 16000)));
+      count = Math.round(Math.max(mobile ? 20 : 40, Math.min(mobile ? 36 : 110, (width * height) / 16000)));
       px = new Float32Array(count);
       py = new Float32Array(count);
       vx = new Float32Array(count);

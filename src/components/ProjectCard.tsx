@@ -58,14 +58,14 @@ export function ProjectCard({ project, variant }: { project: Project; variant: "
       onPointerLeave={onPointerLeave}
       style={enabled ? { rotateX, rotateY, y: lift, transformPerspective: 1100 } : undefined}
       className={clsx(
-        "group relative block aspect-[1.31905] w-full cursor-pointer overflow-hidden rounded-5xl text-white max-xl:rounded-[32px]",
+        "project-card group relative block aspect-[1.31905] w-full cursor-pointer overflow-hidden rounded-5xl text-white max-xl:rounded-[32px]",
         "transition-shadow duration-500 ease-luzia hover-fine:hover:shadow-[0_30px_60px_-30px_rgba(17,17,17,0.45)]",
         featured ? "scroll-mt-20 bg-surface" : "bg-surface",
       )}
     >
       <span
         className={clsx(
-          "absolute -inset-x-[17px] -inset-y-[13px] block",
+          "project-art absolute -inset-x-[17px] -inset-y-[13px] block",
           !featured && "transition-[inset] duration-[400ms] ease-framer group-focus-visible:inset-0 hover-fine:group-hover:inset-0",
         )}
       >
@@ -91,11 +91,11 @@ export function ProjectCard({ project, variant }: { project: Project; variant: "
 
       <span
         className={clsx(
-          "absolute inset-x-0 bottom-0 isolate flex flex-col gap-3 px-6 pb-6",
+          "project-caption absolute inset-x-0 bottom-0 isolate flex flex-col gap-3 px-6 pb-6",
           "before:absolute before:-z-[1] before:backdrop-blur-[20px] before:content-['']",
           "before:[-webkit-mask-image:linear-gradient(180deg,transparent_5%,rgba(0,0,0,0.473)_50%,rgb(0,0,0)_100%)] before:[mask-image:linear-gradient(180deg,transparent_5%,rgba(0,0,0,0.473)_50%,rgb(0,0,0)_100%)]",
           featured
-            ? "items-start before:inset-0"
+            ? "items-start before:inset-0 before:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.8))]"
             : "before:inset-x-0 before:-top-[50px] before:bottom-0 before:bg-[linear-gradient(180deg,transparent,rgba(0,0,0,0.58))]",
         )}
       >

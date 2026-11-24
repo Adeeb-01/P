@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { Navbar } from "@/components/Navbar";
 import { RouteTransition } from "@/components/RouteTransition";
@@ -8,6 +8,7 @@ import { ScrollProgress } from "@/components/motion/ScrollProgress";
 import { CustomCursor } from "@/components/motion/CustomCursor";
 import { Grain } from "@/components/Grain";
 import { SpatialDock } from "@/components/dock/SpatialDock";
+import { MobileQuickBar } from "@/components/dock/MobileQuickBar";
 import { SoundEngine } from "@/components/sound/SoundEngine";
 import { QuickJumpPalette } from "@/components/works/ProjectQuickJump";
 import { THEME_INIT_SCRIPT } from "@/lib/theme";
@@ -15,6 +16,7 @@ import { PRELOADER_INIT_SCRIPT } from "@/lib/preloader";
 import { Preloader } from "@/components/transition/Preloader";
 import { ScrollTelemetry } from "@/components/telemetry/ScrollTelemetry";
 import { ParallaxController } from "@/components/motion/ParallaxController";
+import { SITE_URL } from "@/lib/site";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 
@@ -31,15 +33,33 @@ const instrumentSans = localFont({
   display: "swap",
 });
 
+export const viewport: Viewport = { width: "device-width", initialScale: 1, viewportFit: "cover" };
+const title = "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer";
+const description = "Software Engineer based in Damascus building full-stack web, mobile, and AI systems. Selected work: easy:learning, Tawsela Vendor, Sarafy, and Zad Souq.";
+
 export const metadata: Metadata = {
-  title: "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer",
-  description: "Full-Stack MERN & Next.js developer based in Damascus, specializing in responsive interfaces, RESTful APIs, and RAG-driven intelligent platforms.",
+  metadataBase: new URL(SITE_URL),
+  title,
+  description,
+  alternates: { canonical: "./" },
+  keywords: ["Mohammad Adeeb Alsaleh", "Software Engineer", "Full-Stack MERN", "Next.js", "Flutter", "AI & RAG"],
   authors: [{ name: "Mohammad Adeeb Alsaleh", url: "https://github.com/Adeeb-01" }],
+  creator: "Mohammad Adeeb Alsaleh",
+  robots: { index: true, follow: true },
   openGraph: {
-    title: "Mohammad Adeeb Alsaleh — Software Engineer & AI Developer",
-    description: "Full-Stack MERN & Next.js developer based in Damascus, specializing in responsive interfaces, RESTful APIs, and RAG-driven intelligent platforms.",
+    title,
+    description,
     type: "website",
+    url: "./",
+    locale: "en_US",
     siteName: "Mohammad Adeeb Alsaleh",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Mohammad Adeeb Alsaleh — Software Engineer" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/og-image.png"],
   },
 };
 
@@ -53,7 +73,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <style>{"[data-preloader]{display:none!important}"}</style>
         </noscript>
       </head>
-      <body className="min-h-[901px] font-sans">
+      <body className="min-h-dvh font-sans">
         <MotionProvider>
           <Preloader />
           <ScrollProgress />
@@ -62,6 +82,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Navbar />
           <RouteTransition>{children}</RouteTransition>
           <SpatialDock />
+          <MobileQuickBar />
           <QuickJumpPalette />
           <SoundEngine />
           <Grain />

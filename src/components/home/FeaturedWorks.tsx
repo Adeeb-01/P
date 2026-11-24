@@ -7,7 +7,7 @@ import { EditorialSplit } from "@/components/motion/EditorialSplit";
 
 export function FeaturedWorks() {
   return (
-    <main id="projects" data-telemetry="02 Works" className="flex w-full scroll-mt-20 justify-center bg-canvas pt-[120px] pb-[200px] max-md:pt-20 max-md:pb-[100px]">
+    <main id="projects" data-telemetry="02 Works" className="flex w-full scroll-mt-20 justify-center bg-canvas pt-[120px] pb-[200px] max-xl:py-20 max-md:py-16">
       <div className="flex w-[min(1120px,calc(100%-80px))] flex-col gap-10 max-md:w-[calc(100%-40px)]">
         <div className="flex min-h-12 items-center justify-between">
           <EditorialSplit segments={[{ text: "Featured works" }]} className="m-0 text-section font-medium text-fg" />
@@ -26,7 +26,7 @@ export function FeaturedWorks() {
           </Link>
         </div>
 
-        <VelocitySkew className="grid w-full grid-cols-2 gap-3 max-xl:grid-cols-1">
+        <VelocitySkew className="grid w-full grid-cols-2 gap-4 max-[767.98px]:grid-cols-1">
           {PROJECTS.map((project, index) => (
             <ClipReveal key={project.slug} delay={(index % 2) * 0.08}>
               <ProjectCard project={project} variant="featured" />

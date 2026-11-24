@@ -47,6 +47,7 @@ export function RouteTransition({ children }: { children: React.ReactNode }) {
       if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
       const link = (event.target as Element | null)?.closest?.("a[href]") as HTMLAnchorElement | null;
       if (!link || link.target === "_blank" || link.hasAttribute("download")) return;
+      if (event.detail > 0 && link.closest('[data-swipe-blocked="true"]')) { event.preventDefault(); return; }
       const href = link.getAttribute("href");
       if (!href || href.startsWith("#") || /^(mailto:|tel:|javascript:)/i.test(href)) return;
       const url = new URL(link.href, window.location.href);

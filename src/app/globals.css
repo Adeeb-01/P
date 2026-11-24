@@ -217,3 +217,75 @@
 ::view-transition-new(root) {
   z-index: 2;
 }
+
+
+/* Responsive composition: desktop art direction stays in the component utilities. */
+.hero-stage { display: contents; }
+.mobile-quick-bar { display: none; }
+html { scroll-padding-top: 100px; scroll-padding-bottom: 100px; }
+
+@media (width < 1200px) {
+  :root { --text-section: clamp(28px, 3.8vw, 36px); --text-section--line-height: 1.2; }
+  .closing-section { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+  .hero-stage { display: block; position: relative; isolation: isolate; order: 1; width: min(100%, 560px); aspect-ratio: 1.18; margin: 20px auto 0; }
+  .hero-stage .hero-ambient { inset: 0; width: 100%; height: 100%; }
+  .hero-glow { width: 90%; height: auto; aspect-ratio: 1; }
+  .hero-ring { width: 100%; }
+  .hero-ring canvas { width: 100%; height: auto; aspect-ratio: 1; }
+  .hero-stage .hero-portrait { inset: auto 0 0; width: 100%; height: auto; max-width: 100%; translate: none; }
+  .hero-copy { min-width: 0; }
+  .hero-copy > div { max-width: 720px; margin-inline: auto; }
+  .hero-copy h1 { font-size: clamp(30px, 4.4vw, 42px); line-height: 1.1; letter-spacing: -0.035em; }
+  .hero-copy > div > div:first-child > div:first-child { white-space: normal; height: auto; min-height: 32px; font-size: 13px; }
+  .project-card { display: flex; flex-direction: column; aspect-ratio: auto; background: #17131f; }
+  .project-card .project-art { position: relative; inset: auto; width: 100%; aspect-ratio: 1.45; overflow: hidden; }
+  .project-card .project-caption { position: relative; inset: auto; flex: 1; padding: 18px 20px 20px; gap: 10px; background: #17131f; }
+  .project-caption::before { display: none; }
+  .project-caption > :first-child { font-size: 22px; line-height: 1.2; }
+  .project-caption > :last-child { gap: 6px; }
+  .project-caption > :last-child > span { padding: 5px 8px; font-size: 12px; line-height: 16px; border-color: #ffffff40; background: #ffffff08; white-space: normal; }
+  .proof-card { height: auto; min-height: 340px; gap: 24px; }
+  .site-footer a { display: inline-flex; align-items: center; min-height: 32px; }
+}
+
+@media (768px <= width < 1200px) {
+  #hero { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 20px; align-items: center; padding: 112px 32px 20px; }
+  #hero .hero-copy { grid-column: 1; grid-row: 1; padding: 0; }
+  #hero .hero-stage { grid-column: 2; grid-row: 1; margin: 0; aspect-ratio: 0.92; align-self: end; }
+  .hero-copy h1 { font-size: clamp(30px, 3.55vw, 40px); }
+}
+
+@media (width < 810px) {
+  .mobile-quick-bar { display: flex; position: fixed; z-index: 55; left: 50%; translate: -50% 0; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); gap: 5px; align-items: center; width: max-content; max-width: calc(100% - 32px); padding: 7px 10px; border: 1px solid color-mix(in srgb, var(--theme-fg) 12%, transparent); border-radius: 24px; background: color-mix(in srgb, var(--theme-canvas) 88%, transparent); color: var(--theme-fg); box-shadow: 0 12px 36px -12px #0005; backdrop-filter: blur(16px); }
+  .quick-control { display: grid; place-items: center; flex: none; width: 44px; height: 44px; border: 0; border-radius: 16px; color: inherit; background: transparent; cursor: pointer; }
+  .quick-control:active { background: color-mix(in srgb, var(--theme-fg) 10%, transparent); }
+  .quick-availability { width: auto; min-width: 44px; padding-inline: 8px; }
+  .closing-section { padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)); }
+  nav[aria-label="Primary navigation"] { padding-top: env(safe-area-inset-top, 0px); }
+  .site-footer nav > div { min-width: 0; }
+  .site-footer nav { justify-content: stretch; }
+  .site-footer a { min-height: 44px; overflow-wrap: anywhere; }
+  .site-footer ul { gap: 0; }
+  .site-footer p { overflow-wrap: anywhere; }
+  #contact-form { scroll-margin-block: 100px; }
+  input, textarea { scroll-margin-block: 100px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-stage *, .hero-copy [style], .project-card { will-change: auto; }
+}
+
+.touch-deck { --deck-width: min(82vw, 560px); position: relative; display: flex; gap: 16px; overflow-x: auto; overflow-y: hidden; padding: 16px max(20px, calc((100% - var(--deck-width)) / 2)); scroll-padding-inline: max(20px, calc((100% - var(--deck-width)) / 2)); scroll-snap-type: x mandatory; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x pan-y; }
+.touch-deck::-webkit-scrollbar { display: none; }
+.touch-deck-slot { width: var(--deck-width); flex: none; min-width: 0; scroll-snap-align: center; scroll-snap-stop: always; }
+.touch-deck-card { transform-origin: 50% 50%; height: 100%; }
+.touch-deck-card > a { height: 100%; }
+.deck-arrow { display: grid; place-items: center; width: 44px; height: 44px; flex: none; border: 1px solid var(--color-line); border-radius: 50%; background: var(--color-surface); color: var(--color-fg); cursor: pointer; }
+.deck-arrow:disabled { opacity: 0.3; cursor: default; }
+@media (prefers-reduced-motion: reduce) { .touch-deck { scroll-behavior: auto; } }
+
+@media (width < 1200px) {
+  .stats-card { height: 280px; }
+  .stats-card > div:first-child { top: 82px; }
+  .stats-card[data-touch-stats] > div:first-child > div { position: relative; inset: auto; margin-bottom: 8px; }
+}

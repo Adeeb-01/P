@@ -1,5 +1,5 @@
 /** Service offerings shown on the Home page (cards + expanded detail panels). */
-const IMG = "/assets/images/framerusercontent.com";
+const IMG = "/assets/images/services";
 
 export type ServiceKey = "full-stack" | "ai-rag" | "backend-api";
 
@@ -10,7 +10,7 @@ export type Service = {
   prominent?: boolean;
   icon: { src: string; tile: string; filter: string };
   description: string;
-  /** ⚠️ Temporary placeholder images carried over from the original template. */
+  /** Real project screenshots shown in the service cards. */
   previews: { src: string; width: number; height: number; alt: string }[];
   tags: string[];
 };
@@ -30,9 +30,9 @@ export const SERVICES: Service[] = [
     description:
       "Building scalable, responsive web applications from database modeling to modern React & Next.js interfaces using the MERN stack.",
     previews: [
-      { src: `${IMG}/kFcT28JBAneTQjyVSMGiDyiwRlw-29d4f58ff0.png`, width: 1200, height: 600, alt: "Placeholder preview image" },
-      { src: `${IMG}/Fm5dfyOw1px3Dsxu5sZmvHsOrKw-83ae28c313.png`, width: 1200, height: 801, alt: "Placeholder preview image" },
-      { src: `${IMG}/6GwrKzXzNodjRpfhql82bLNul1E-737200f727.jpg`, width: 1200, height: 904, alt: "Placeholder preview image" },
+      { src: `${IMG}/service-fullstack-1.webp`, width: 800, height: 800, alt: "ZAD Souq storefront category and product grid" },
+      { src: `${IMG}/service-fullstack-2.webp`, width: 800, height: 800, alt: "Easy Learning student homepage" },
+      { src: `${IMG}/service-fullstack-3.webp`, width: 800, height: 800, alt: "Sarafy exchange-rate pricing screen" },
     ],
     tags: ["React & Next.js", "Node & Express", "MongoDB", "+more"],
   },
@@ -49,9 +49,9 @@ export const SERVICES: Service[] = [
     description:
       "Integrating Large Language Models, VectorDB semantic search, and Retrieval-Augmented Generation (RAG) workflows into practical web platforms.",
     previews: [
-      { src: `${IMG}/At4lVgdsU3vOE8OU9MxhtrSyU-057761a71c.png`, width: 1200, height: 933, alt: "Placeholder preview image" },
-      { src: `${IMG}/DxUbioKrcg6pEvPVPn8MKs3ShqY-a8c1689a65.png`, width: 1200, height: 800, alt: "Placeholder preview image" },
-      { src: `${IMG}/b89txAvenwqESiiy4RmX2Rq3cqw-7f76c8b687.png`, width: 1200, height: 904, alt: "Placeholder preview image" },
+      { src: `${IMG}/service-ai-1.webp`, width: 800, height: 800, alt: "AI tutor panel beside a video lesson" },
+      { src: `${IMG}/service-ai-2.webp`, width: 800, height: 800, alt: "Adaptive IRT quiz, student view" },
+      { src: `${IMG}/service-ai-3.webp`, width: 800, height: 800, alt: "AI feature list: RAG tutor, adaptive and oral assessment, remediation" },
     ],
     tags: ["LLM APIs", "RAG pipelines", "VectorDB", "+more"],
   },
@@ -67,9 +67,9 @@ export const SERVICES: Service[] = [
     description:
       "Designing secure RESTful APIs, authentication systems, and relational/NoSQL database architectures (MongoDB & MySQL) built for reliability.",
     previews: [
-      { src: `${IMG}/FTAZ2Zly1EytGDVYhAqfSwh75I-8d00532f46.png`, width: 1200, height: 1200, alt: "Placeholder preview image" },
-      { src: `${IMG}/1x6Kw84z16xT9kYkhOHSldsqAF4-4724d9b0db.png`, width: 1200, height: 904, alt: "Placeholder preview image" },
-      { src: `${IMG}/KI7aSRP3L2vttQ79sArwUunvcBk-8859d6c6c6.png`, width: 1200, height: 673, alt: "Placeholder preview image" },
+      { src: `${IMG}/service-backend-1.webp`, width: 800, height: 800, alt: "Admin dashboard with users, courses, enrollments and revenue" },
+      { src: `${IMG}/service-backend-2.webp`, width: 800, height: 800, alt: "Vendor order-status pipeline: pending, accepted, preparing, ready, en route" },
+      { src: `${IMG}/service-backend-3.webp`, width: 800, height: 800, alt: "Vendor earnings analytics with daily bar chart" },
     ],
     tags: ["REST APIs", "JWT & RBAC", "MySQL & MongoDB", "+more"],
   },

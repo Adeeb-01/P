@@ -1,9 +1,12 @@
 "use client";
 
-import { useEffect, useRef, type RefObject } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import clsx from "clsx";
 import { FRAGMENT_BODY } from "@/lib/shader-fragment";
 import { DEFAULT_SHADER_PARAMS, hueRotate, type ShaderParams } from "@/lib/shader-params";
+
+import { useMobileGpu, usePrefersReducedMotion } from "@/components/motion/hooks";
+import { renderQuality } from "@/lib/render-quality";
 
 const HEIGHTMAP_SRC = "/assets/images/luzia-shader-heightmap.png";
 
@@ -96,6 +99,9 @@ export function ShaderObject({
   trackingRoot?: RefObject<HTMLElement | null> | null;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mobile = useMobileGpu();
+  const reducedMotion = usePrefersReducedMotion();
+  const [generation, setGeneration] = useState(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -111,8 +117,10 @@ export function ShaderObject({
       if (!gl) return;
 
       const program = gl.createProgram()!;
-      gl.attachShader(program, compile(gl, gl.VERTEX_SHADER, VERTEX));
-      gl.attachShader(program, compile(gl, gl.FRAGMENT_SHADER, DECLARATIONS + FRAGMENT_BODY));
+      const vs = compile(gl, gl.VERTEX_SHADER, VERTEX);
+      const fs = compile(gl, gl.FRAGMENT_SHADER, DECLARATIONS + FRAGMENT_BODY);
+      gl.attachShader(program, vs);
+      gl.attachShader(program, fs);
       gl.linkProgram(program);
       if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) || "Shader link failed");
       gl.useProgram(program);
@@ -151,7 +159,13 @@ export function ShaderObject({
         if (location !== null) gl.uniform1f(location, value);
       }
 
-      const loc = (name: string) => gl.getUniformLocation(program, name);
+      const locations = new Map<string, WebGLUniformLocation | null>();
+      const loc = (name: string) => {
+        if (!locations.has(name)) locations.set(name, gl.getUniformLocation(program, name));
+        return locations.get(name)!;
+      };
+      gl.uniform1f(loc("u_turbIter"), mobile ? 4 : 5);
+      const quality = renderQuality(mobile);
       // Eased live parameters (ShaderLab). Palette colours: violet + mist get hue-rotated.
       const live = { ...DEFAULT_SHADER_PARAMS };
       let uploadedHue = -1;
@@ -159,7 +173,7 @@ export function ShaderObject({
       const applyParams = () => {
         const target = params?.current;
         if (!target) return;
-        const ease = 0.08;
+        const ease = reduced.matches ? 1 : 0.08;
         live.distortion += (target.distortion - live.distortion) * ease;
         live.flow += (target.flow - live.flow) * ease;
         live.hue += (target.hue - live.hue) * ease;
@@ -180,18 +194,19 @@ export function ShaderObject({
       const mouse = { x: -999, y: -999, px: -999, py: -999, hover: 0, down: 0, impulse: 0, energy: 0, fx: -999, fy: -999 };
       const onEnter = () => { mouse.hover = 1; };
       const onLeave = () => { mouse.hover = 0; mouse.down = 0; };
-      const onDown = () => { mouse.down = 1; mouse.impulse = 1; };
+      const onDown = (event: PointerEvent) => { if (reduced.matches) return; onMove(event); mouse.hover = 1; mouse.down = 1; mouse.impulse = 1; resume(); };
       const onUp = () => { mouse.down = 0; };
       let cachedRect: DOMRect | null = null;
       const invalidateRect = () => {
         cachedRect = null;
       };
       const onMove = (event: PointerEvent) => {
+        if (reduced.matches) return;
         const rect = (cachedRect ??= canvas!.getBoundingClientRect()); // cached; invalidated on scroll/resize
         mouse.px = mouse.x;
         mouse.py = mouse.y;
-        mouse.x = (event.clientX - rect.left) / rect.width;
-        mouse.y = (event.clientY - rect.top) / rect.height;
+        mouse.x = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
+        mouse.y = Math.max(0, Math.min(1, (event.clientY - rect.top) / rect.height));
       };
 
       const started = performance.now();
@@ -199,14 +214,30 @@ export function ShaderObject({
       let frame = 0;
       let running = false;
       let lost = false;
-      let onScreen = true;
+      let onScreen = false;
+      let scrollEnergy = 0;
+      let lastScrollY = window.scrollY;
+      let lastScrollT = performance.now();
+      const onScroll = () => {
+        invalidateRect();
+        const now = performance.now();
+        const speed = Math.abs(window.scrollY - lastScrollY) / Math.max(now - lastScrollT, 8);
+        lastScrollY = window.scrollY;
+        lastScrollT = now;
+        if (onScreen && !reduced.matches) {
+          scrollEnergy = Math.min(1, speed / 3);
+          mouse.x = mouse.y = 0.5;
+          resume();
+        }
+      };
 
       const draw = (now: number) => {
         frame = 0;
         if (document.hidden || lost || !onScreen || !canvas!.isConnected) { running = false; return; }
         running = true;
         try {
-          const dpr = Math.max(1, window.devicePixelRatio || 1);
+          quality.sample(now - last);
+          const dpr = quality.dpr;
           const width = Math.max(1, Math.round(canvas!.clientWidth * dpr));
           const height = Math.max(1, Math.round(canvas!.clientHeight * dpr));
           if (canvas!.width !== width || canvas!.height !== height) { canvas!.width = width; canvas!.height = height; }
@@ -216,7 +247,8 @@ export function ShaderObject({
           gl.uniform2f(loc("u_resolution"), width, height);
           gl.uniform1f(loc("u_pixelRatio"), dpr);
           // Pointer velocity → push strength; click impulse → decaying pulse through the surface.
-          const dt = Math.max((now - last) / 1000, 1 / 240);
+          const dt = Math.min(0.05, Math.max((now - last) / 1000, 1 / 240));
+          scrollEnergy *= Math.exp(-dt * 4);
           const travelled = mouse.fx === -999 ? 0 : Math.hypot(mouse.x - mouse.fx, mouse.y - mouse.fy);
           mouse.fx = mouse.x;
           mouse.fy = mouse.y;
@@ -224,12 +256,13 @@ export function ShaderObject({
           mouse.impulse *= Math.exp(-dt * 3.2);
           gl.uniform4f(loc("u_mousePosition"), mouse.x, mouse.y, mouse.x - mouse.px, mouse.y - mouse.py);
           gl.uniform1f(loc("u_mousePointerDown"), Math.max(mouse.down, mouse.impulse));
-          gl.uniform1f(loc("u_pushAmount"), UNIFORMS.u_pushAmount + mouse.energy * 10 + mouse.impulse * 14);
-          gl.uniform1f(loc("u_mouseHover"), mouse.hover);
+          gl.uniform1f(loc("u_pushAmount"), UNIFORMS.u_pushAmount + mouse.energy * 10 + mouse.impulse * 14 + scrollEnergy * 5);
+          gl.uniform1f(loc("u_mouseHover"), Math.max(mouse.hover, scrollEnergy, mouse.impulse));
           gl.clearColor(0, 0, 0, 0);
           gl.clear(gl.COLOR_BUFFER_BIT);
           applyParams();
           gl.drawArrays(gl.TRIANGLES, 0, 6);
+          canvas!.dataset.rendered = "true";
           last = now;
         } catch {
           running = false;
@@ -240,7 +273,7 @@ export function ShaderObject({
         else running = false;
       };
       const resume = () => {
-        if (!running && !frame && !document.hidden && !lost) frame = requestAnimationFrame(draw);
+        if (!running && !frame && !document.hidden && !lost && onScreen) { last = performance.now(); frame = requestAnimationFrame(draw); }
       };
       if (params?.current) params.current.wake = () => {
         settled = false;
@@ -261,8 +294,7 @@ export function ShaderObject({
         frame = 0;
       };
       const onRestored = () => {
-        lost = false;
-        resume();
+        setGeneration((value) => value + 1);
       };
 
       pointerRoot.addEventListener("pointerenter", onEnter);
@@ -272,13 +304,16 @@ export function ShaderObject({
       canvas.addEventListener("webglcontextlost", onLost);
       canvas.addEventListener("webglcontextrestored", onRestored);
       window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointercancel", onLeave);
       document.addEventListener("visibilitychange", onVisibility);
-      window.addEventListener("scroll", invalidateRect, { passive: true });
+      window.addEventListener("scroll", onScroll, { passive: true });
       window.addEventListener("resize", invalidateRect);
       // Pause the render loop entirely while the object is offscreen.
       const observer = new IntersectionObserver(([entry]) => {
         onScreen = entry.isIntersecting;
+        canvas!.style.animationPlayState = onScreen && !reduced.matches ? "running" : "paused";
         if (onScreen) resume();
+        else { cancelAnimationFrame(frame); frame = 0; running = false; }
       });
       observer.observe(canvas);
       resume();
@@ -292,14 +327,17 @@ export function ShaderObject({
         canvas.removeEventListener("webglcontextlost", onLost);
         canvas.removeEventListener("webglcontextrestored", onRestored);
         window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointercancel", onLeave);
         document.removeEventListener("visibilitychange", onVisibility);
-        window.removeEventListener("scroll", invalidateRect);
+        window.removeEventListener("scroll", onScroll);
         window.removeEventListener("resize", invalidateRect);
         observer.disconnect();
         buffers.forEach((buffer) => gl.deleteBuffer(buffer));
         gl.deleteTexture(texture);
         gl.deleteProgram(program);
-        gl.getExtension("WEBGL_lose_context")?.loseContext();
+        gl.deleteShader(vs);
+        gl.deleteShader(fs);
+        if (params?.current) params.current.wake = undefined;
       };
     }
 
@@ -325,10 +363,12 @@ export function ShaderObject({
       window.removeEventListener("load", schedule);
       teardown?.();
     };
-  }, [trackingRoot, params]);
+  }, [trackingRoot, params, mobile, reducedMotion, generation]);
 
   return (
     <canvas
+      key={`${mobile}-${reducedMotion}-${generation}`}
+      data-closing-shader
       ref={canvasRef}
       width={360}
       height={360}

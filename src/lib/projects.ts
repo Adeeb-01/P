@@ -1,12 +1,5 @@
-/**
- * Project + case-study content for Mohammad Adeeb Alsaleh.
- *
- * ⚠️ Cover images are TEMPORARY placeholders carried over from the original template (they are not
- * screenshots of these projects). Replace `image` / `featuredImage` with real screenshots, and the
- * `gallery` crops will follow automatically.
- */
-
-const IMG = "/assets/images/framerusercontent.com";
+/** Project + case-study content for Mohammad Adeeb Alsaleh. */
+const IMG = "/assets/images/projects";
 
 export type ProjectImage = { src: string; width: number; height: number; alt: string };
 
@@ -34,11 +27,11 @@ export type Project = {
   };
 };
 
-const placeholder = (src: string, width: number, height: number, title: string): ProjectImage => ({
-  src,
-  width,
-  height,
-  alt: `Placeholder cover image for ${title}`,
+const cover = (slug: string, alt: string): ProjectImage => ({
+  src: `${IMG}/${slug}.webp`,
+  width: 2880,
+  height: 2160,
+  alt,
 });
 
 const GALLERY: GalleryCrop[] = [
@@ -54,23 +47,75 @@ export const PROJECTS: Project[] = [
     title: "easy:learning",
     tagline: "AI-Powered Learning Management System",
     tags: ["Next.js", "MERN Stack", "AI & RAG", "VectorDB"],
-    featuredImage: placeholder(`${IMG}/fsM37QoHH0cBakZGS5loTZtWXQY-ee4b2b53e5.webp`, 3200, 2400, "easy:learning"),
-    image: placeholder(`${IMG}/fsM37QoHH0cBakZGS5loTZtWXQY-ee4b2b53e5.webp`, 3200, 2400, "easy:learning"),
+    featuredImage: cover("easy-learning", "Easy Learning AI LMS — student homepage, admin dashboard, AI tutor and adaptive quiz screens"),
+    image: cover("easy-learning", "Easy Learning AI LMS — student homepage, admin dashboard, AI tutor and adaptive quiz screens"),
     caseStudy: {
-      summary: "Full-stack adaptive Learning Management System integrating LLM-assisted content generation and RAG semantic search.",
+      summary: "Full-stack adaptive Learning Management System integrating LLM-assisted content generation and Retrieval-Augmented Generation (RAG) semantic search.",
       role: "Full-stack & AI engineer",
       type: "AI-powered LMS",
-      challenge: "Traditional learning platforms suffer from static content discovery and manual educational workflow management.",
+      challenge: "Traditional educational platforms rely on static keyword search and manual content workflows, making personalized study guidance difficult.",
       approach: [
-        "Built a full-stack MERN & Next.js platform backed by MongoDB and VectorDB.",
-        "Implemented Retrieval-Augmented Generation (RAG) for accurate information retrieval and AI-assisted content creation.",
-        "Delivered real-time student progress dashboards for learners and administrators.",
+        "Built a full-stack Next.js, React, Node.js, and MongoDB platform integrated with VectorDB and LLMs.",
+        "Delivered grounded semantic retrieval (RAG) and AI-assisted content creation.",
+        "Implemented real-time student progress dashboards.",
       ],
-      deliverables: ["Next.js Web App", "RAG Search Engine", "Admin & Student Dashboards", "RESTful API"],
+      deliverables: ["Next.js Web Platform", "RAG Semantic Search", "AI Content Workflows", "Progress Dashboards"],
       metrics: [
-        { value: "RAG", label: "Semantic search over course content" },
-        { value: "Full-Stack", label: "MERN + Next.js" },
-        { value: "100%", label: "End-to-end architecture" },
+        { value: "RAG", label: "Grounded Search" },
+        { value: "MERN + Next.js", label: "Full-Stack" },
+        { value: "VectorDB", label: "Semantic Indexing" },
+      ],
+      gallery: GALLERY,
+    },
+  },
+  {
+    slug: "tawsela-vendor",
+    title: "Tawsela Vendor",
+    tagline: "Merchant Operations & Order Management App",
+    tags: ["Flutter", "Dart", "GetX", "Firebase", "Bilingual AR/EN"],
+    featuredImage: cover("tawsela-vendor", "Tawsela Vendor mobile app — store management, live orders and earnings report screens"),
+    image: cover("tawsela-vendor", "Tawsela Vendor mobile app — store management, live orders and earnings report screens"),
+    caseStudy: {
+      summary: "Production merchant mobile app for the Tawsela delivery platform enabling restaurants and stores to manage live orders, catalogs, revenue, and subscriptions.",
+      role: "Mobile engineer",
+      type: "Merchant operations app",
+      challenge: "Store owners needed instantaneous incoming-order alerts, live order synchronization, and strict financial input validation across Arabic (RTL) and English interfaces.",
+      approach: [
+        "Engineered on Flutter 3.47 with GetX state management and Firebase integration.",
+        "Delivered repeating incoming-order chimes, live order tracking, net income dashboards, and eligibility-filtered categories.",
+        "Validated the interface with golden-image widget tests across 13 iterative release rounds.",
+      ],
+      deliverables: ["Flutter Android App", "Live Order Sync & Alerts", "Store & Catalog Manager", "Bilingual AR/EN UI"],
+      metrics: [
+        { value: "Flutter 3.47", label: "Cross-Platform" },
+        { value: "Live Sync", label: "Real-Time Orders" },
+        { value: "AR / EN", label: "Full RTL Support" },
+      ],
+      gallery: GALLERY,
+    },
+  },
+  {
+    slug: "sarafy",
+    title: "Sarafy",
+    tagline: "Offline-First POS, Pricing & Analytics App",
+    tags: ["React Native", "Expo", "TypeScript", "SQLite", "Offline-First"],
+    featuredImage: cover("sarafy", "Sarafy pricing app — live USD exchange rate and product prices in Syrian pounds"),
+    image: cover("sarafy", "Sarafy pricing app — live USD exchange rate and product prices in Syrian pounds"),
+    caseStudy: {
+      summary: "Zero-server bilingual grocery pricing, invoicing, and business analytics mobile application with live USD-to-SYP exchange conversion and offline PDF/Excel reporting.",
+      role: "Mobile & data engineer",
+      type: "Offline-first POS & analytics app",
+      challenge: "Retail stores operating without reliable internet needed instant multi-currency price conversion, historical profit accuracy, and portable backups without external cloud servers.",
+      approach: [
+        "Built with Expo, React Native, TypeScript, Zustand, and expo-sqlite (WAL mode).",
+        "Stored immutable price, cost, and rate snapshots per invoice alongside automated rounding rules.",
+        "Integrated native PDF invoice generation and SheetJS Excel import/export.",
+      ],
+      deliverables: ["Offline SQLite Engine", "USD→SYP Pricing Catalog", "PDF Invoicing & Analytics", "Excel & JSON Backup"],
+      metrics: [
+        { value: "100% Offline", label: "SQLite WAL" },
+        { value: "PDF & Excel", label: "Native Export" },
+        { value: "Real-Time", label: "Net Profit Analytics" },
       ],
       gallery: GALLERY,
     },
@@ -80,75 +125,23 @@ export const PROJECTS: Project[] = [
     title: "Zad Souq",
     tagline: "Full-Stack E-Commerce Platform",
     tags: ["MongoDB", "Express.js", "React.js", "Node.js"],
-    featuredImage: placeholder(`${IMG}/0An7MEBSkTQoOHCavzg1cniIiw-44f6922f64.webp`, 904, 1200, "Zad Souq"),
-    image: placeholder(`${IMG}/0An7MEBSkTQoOHCavzg1cniIiw-ce100f8119.webp`, 904, 1200, "Zad Souq"),
+    featuredImage: cover("zad-souq", "ZAD Souq e-commerce storefront — category navigation, featured categories and popular products"),
+    image: cover("zad-souq", "ZAD Souq e-commerce storefront — category navigation, featured categories and popular products"),
     caseStudy: {
-      summary: "End-to-end MERN e-commerce web application engineered for responsive shopping, cart management, and reliable order processing.",
+      summary: "Full-stack MERN e-commerce web application engineered for responsive browsing, shopping cart state management, and reliable order processing.",
       role: "Full-stack engineer",
       type: "E-commerce platform",
-      challenge: "Delivering a fast, intuitive storefront and stable order pipeline across mobile and desktop devices.",
+      challenge: "Delivering a fast, intuitive storefront and consistent backend order pipeline across mobile, tablet, and desktop viewports.",
       approach: [
-        "Architected a modular Node.js & Express backend connected to MongoDB.",
-        "Paired it with a responsive React frontend featuring dynamic product catalogs.",
-        "Implemented persistent shopping cart state and streamlined checkout workflows.",
+        "Architected modular RESTful APIs in Node.js and Express backed by MongoDB.",
+        "Paired the backend with a responsive React storefront featuring dynamic product filtering.",
+        "Delivered persistent cart workflows and end-to-end checkout stability.",
       ],
-      deliverables: ["Responsive Storefront", "Cart & Checkout Flow", "Product Management API", "Database Schema"],
+      deliverables: ["Responsive Storefront", "Cart & Checkout Pipeline", "Product & Order APIs", "MongoDB Data Models"],
       metrics: [
-        { value: "MERN", label: "Full-stack core" },
-        { value: "REST", label: "Modular APIs" },
-        { value: "Multi-Device", label: "Responsive UI" },
-      ],
-      gallery: GALLERY,
-    },
-  },
-  {
-    slug: "rag-knowledge-engine",
-    title: "RAG Knowledge Assistant",
-    tagline: "Intelligent Document Retrieval Engine",
-    tags: ["Python", "LLMs", "VectorDB", "Next.js"],
-    featuredImage: placeholder(`${IMG}/78zztBdraLorK1R0rLCLLGkv4-6053ee275e.webp`, 2560, 2034, "RAG Knowledge Assistant"),
-    image: placeholder(`${IMG}/78zztBdraLorK1R0rLCLLGkv4-cba4611bbb.webp`, 2560, 2034, "RAG Knowledge Assistant"),
-    caseStudy: {
-      summary: "Context-aware AI assistant pipeline enabling semantic querying and grounded content synthesis over structured technical documents.",
-      role: "AI & backend engineer",
-      type: "AI knowledge assistant",
-      challenge: "Standard LLM prompts hallucinate or lack domain-specific context when querying private documentation.",
-      approach: [
-        "Engineered an embedding and chunking pipeline connected to a VectorDB store.",
-        "Built a Next.js streaming chat interface on top of the retrieval layer.",
-        "Ensured responses are strictly grounded in retrieved source passages.",
-      ],
-      deliverables: ["Vector Indexing Pipeline", "LLM Grounding API", "Streaming Chat UI", "Technical Docs"],
-      metrics: [
-        { value: "VectorDB", label: "Semantic index" },
-        { value: "LLM", label: "Grounded synthesis" },
-        { value: "Low-Latency", label: "Streaming UI" },
-      ],
-      gallery: GALLERY,
-    },
-  },
-  {
-    slug: "modular-rest-core",
-    title: "Modular REST & Auth Core",
-    tagline: "Scalable Backend Boilerplate",
-    tags: ["Node.js", "Express.js", "MySQL", "System Design"],
-    featuredImage: placeholder(`${IMG}/VJR2tpvQTbtvxZmeAxF5UHQPx1U-45cd08373c.webp`, 1200, 800, "Modular REST & Auth Core"),
-    image: placeholder(`${IMG}/VJR2tpvQTbtvxZmeAxF5UHQPx1U-9dea1a29b8.webp`, 1200, 800, "Modular REST & Auth Core"),
-    caseStudy: {
-      summary: "Production-ready backend architecture featuring role-based authentication, relational/NoSQL data modeling, and automated API documentation.",
-      role: "Backend engineer",
-      type: "Backend architecture",
-      challenge: "Eliminating repetitive setup and security bottlenecks when launching new data-driven web systems.",
-      approach: [
-        "Designed a clean, spec-driven Node.js/Express service layer with standardized error handling.",
-        "Added JWT authentication with role-based access control and MySQL & MongoDB adapters.",
-        "Covered the API with comprehensive Postman test suites and documentation.",
-      ],
-      deliverables: ["Auth & RBAC Layer", "Database Models", "REST API Suite", "Postman Documentation"],
-      metrics: [
-        { value: "RBAC", label: "Secure auth" },
-        { value: "Dual-DB", label: "MySQL & MongoDB" },
-        { value: "Spec-Driven", label: "Architecture" },
+        { value: "MERN Stack", label: "End-to-End" },
+        { value: "REST API", label: "Modular Core" },
+        { value: "Responsive", label: "Multi-Device UI" },
       ],
       gallery: GALLERY,
     },

@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState } from "react";
 import { m, useScroll, useTransform, type Variants } from "motion/react";
 import clsx from "clsx";
-import { useMagnetic } from "@/components/motion/hooks";
+import { useMagnetic, useMobileGpu, usePrefersReducedMotion } from "@/components/motion/hooks";
 import { Hero3DCore } from "@/components/hero/Hero3DCore";
 import { PortraitSheen } from "@/components/hero/PortraitSheen";
 import { Shine } from "@/components/motion/Shine";
 import { ProximityChar, ProximityProvider, useProximityField } from "@/components/motion/ProximityText";
 import { usePreloaderDone } from "@/components/transition/Preloader";
 
-const PORTRAIT = "/assets/images/framerusercontent.com/yHECzzvtCQT7X8sGipPGW5sEc-f4fe77a16e.webp";
+const PORTRAIT = "/assets/images/hero-portrait.webp";
 
 const fade = "max-tab:transition-none motion-reduce:duration-[0.01ms]";
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -50,6 +50,9 @@ function EmailCta() {
 
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
+  const stageRef = useRef<HTMLDivElement>(null);
+  const mobile = useMobileGpu();
+  const reduced = usePrefersReducedMotion();
   const portraitRef = useRef<HTMLImageElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const [decoded, setReady] = useState(false);
@@ -61,8 +64,8 @@ export function Hero() {
 
   // Scroll parallax: the portrait sinks slightly slower than the page, the glow drifts further.
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const portraitY = useTransform(scrollYProgress, [0, 1], [0, 90]);
-  const glowY = useTransform(scrollYProgress, [0, 1], [0, 180]);
+  const portraitY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : mobile ? 12 : 90]);
+  const glowY = useTransform(scrollYProgress, [0, 1], [0, reduced ? 0 : mobile ? 18 : 180]);
 
   // Hold the hidden state until the portrait is decoded (capped at 1.2s) so the fade never starts on an empty image.
   useEffect(() => {
@@ -101,12 +104,13 @@ export function Hero() {
       data-telemetry="01 Hero"
       className="relative h-screen scroll-mt-20 overflow-hidden bg-canvas max-xl:flex max-xl:h-auto max-xl:min-h-0 max-xl:flex-col max-xl:justify-start"
     >
-      {/* Ambient violet glow floating behind the portrait. */}
-      <m.div aria-hidden="true" style={{ y: glowY }} className="pointer-events-none absolute inset-x-0 top-[1%] z-0 grid place-items-center max-xl:top-[30%]">
+      <div ref={stageRef} className="hero-stage">
+      {/* The ring and portrait share a bounded stage on mobile/tablet. */}
+      <m.div aria-hidden="true" style={{ y: glowY }} className="hero-ambient pointer-events-none absolute inset-x-0 top-[1%] z-0 grid place-items-center">
         <m.div
-          className="[grid-area:1/1] h-[min(720px,90vw)] w-[min(720px,90vw)] rounded-full bg-[radial-gradient(closest-side,rgba(116,48,247,0.16),rgba(116,48,247,0.05)_55%,transparent)]"
+          className="hero-glow [grid-area:1/1] h-[min(720px,90vw)] w-[min(720px,90vw)] rounded-full bg-[radial-gradient(closest-side,rgba(116,48,247,0.16),rgba(116,48,247,0.05)_55%,transparent)]"
           initial={{ opacity: 0, scale: 0.85 }}
-          animate={ready ? { opacity: 1, scale: [1, 1.08, 1], x: [0, 24, -16, 0], y: [0, -18, 10, 0] } : { opacity: 0 }}
+          animate={ready ? reduced ? { opacity: 1, scale: 1, x: 0, y: 0 } : { opacity: 1, scale: [1, 1.08, 1], x: [0, 24, -16, 0], y: [0, -18, 10, 0] } : { opacity: 0 }}
           transition={{
             opacity: { duration: 1.6, ease: EASE },
             scale: { duration: 14, repeat: Infinity, ease: "easeInOut" },
@@ -116,30 +120,29 @@ export function Hero() {
         />
         {/* Raymarched liquid-glass ring (WebGL2) framing the portrait, over the CSS glow fallback. */}
         <m.div
-          className="[grid-area:1/1]"
+          className="hero-ring [grid-area:1/1]"
           initial={{ opacity: 0 }}
           animate={{ opacity: ready ? 1 : 0 }}
           transition={{ duration: 1.8, ease: EASE }}
         >
-          <Hero3DCore pointerRoot={heroRef} className="block h-[min(780px,96vw)] w-[min(780px,96vw)]" />
+          <Hero3DCore pointerRoot={mobile ? stageRef : heroRef} className="block h-[min(780px,96vw)] w-[min(780px,96vw)]" />
         </m.div>
       </m.div>
 
       <m.div
         style={{ y: portraitY }}
         className={clsx(
-          "absolute top-[88px] left-1/2 z-[1] block aspect-[1242/986] h-[calc(100%-26px)] w-auto max-w-none -translate-x-1/2",
-          "max-xl:relative max-xl:inset-auto max-xl:order-1 max-xl:mx-auto max-xl:h-auto max-xl:w-[719px] max-xl:flex-none max-xl:translate-x-0",
-          "max-md:mt-[23px] max-md:-mb-[10px] max-md:w-[clamp(564px,92vw,719px)]",
+          "hero-portrait absolute top-[88px] left-1/2 z-[1] block aspect-[1242/986] h-[calc(100%-26px)] w-auto max-w-none -translate-x-1/2",
           "transition-opacity duration-[650ms] ease-standard",
           fade,
           ready ? "opacity-100" : "opacity-0",
         )}
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- exact intrinsic sizing is required for pixel parity */}
-        <img ref={portraitRef} data-hero-portrait src={PORTRAIT} width={1242} height={986} alt="Portrait (placeholder image)" className="block h-full w-full" />
+        <img ref={portraitRef} data-hero-portrait src={PORTRAIT} width={2484} height={1972} alt="Mohammad Adeeb Alsaleh — Software Engineer" className="block h-full w-full" />
         <PortraitSheen src={PORTRAIT} pointerRoot={heroRef} />
       </m.div>
+      </div>
 
       <div
         aria-hidden="true"
@@ -152,7 +155,7 @@ export function Hero() {
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[2] hidden h-[58%] bg-[linear-gradient(90deg,var(--theme-canvas)_0%,var(--theme-canvas)_18%,color-mix(in_srgb,var(--theme-canvas)_70%,transparent)_33%,transparent_46%,transparent_60%,color-mix(in_srgb,var(--theme-canvas)_70%,transparent)_70%,var(--theme-canvas)_84%)] [-webkit-mask-image:linear-gradient(to_bottom,transparent,#000_42%)] [mask-image:linear-gradient(to_bottom,transparent,#000_42%)] dark:xl:block"
       />
 
-      <div className="absolute inset-x-0 bottom-0 z-[3] flex h-[350px] items-center justify-center px-10 max-xl:relative max-xl:inset-auto max-xl:order-none max-xl:block max-xl:h-auto max-xl:w-full max-xl:pt-[120px] max-md:px-5">
+      <div className="hero-copy absolute inset-x-0 bottom-0 z-[3] flex h-[350px] items-center justify-center px-10 max-xl:relative max-xl:inset-auto max-xl:order-none max-xl:block max-xl:h-auto max-xl:w-full max-xl:pt-[104px] max-md:px-5">
         <div className="flex h-[350px] w-full max-w-[1440px] items-center justify-between pb-14 max-xl:block max-xl:h-auto max-xl:max-w-[520px] max-xl:p-0 max-md:max-w-none">
           <div
             className={clsx(

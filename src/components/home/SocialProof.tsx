@@ -3,13 +3,13 @@ import { RefractiveCard } from "@/components/motion/RefractiveCard";
 import { Reveal } from "@/components/motion/Reveal";
 import { StatsCard } from "@/components/home/StatsCard";
 
-const card = "relative h-[450px] min-w-0 overflow-hidden rounded-5xl max-md:w-full";
+const card = "proof-card relative h-[450px] min-w-0 overflow-hidden rounded-5xl max-md:w-full";
 
 
 export function SocialProof() {
   return (
-    <section aria-label="Education, certifications and experience" data-telemetry="03 Proof" className="flex w-full justify-center bg-canvas pb-[200px] max-md:py-[100px]">
-      <Reveal className="grid w-[min(1128px,calc(100%-80px))] grid-cols-[minmax(0,32fr)_minmax(0,38fr)_minmax(0,30fr)] items-start gap-3 max-md:w-[calc(100%-40px)] max-md:grid-cols-1">
+    <section aria-label="Education, certifications and experience" data-telemetry="03 Proof" className="flex w-full justify-center bg-canvas pb-[200px] max-xl:pb-20 max-md:pb-16">
+      <Reveal className="grid w-[min(1128px,calc(100%-80px))] grid-cols-[minmax(0,32fr)_minmax(0,38fr)_minmax(0,30fr)] items-start gap-3 max-md:w-[calc(100%-40px)] max-xl:grid-cols-2 max-[767.98px]:grid-cols-1">
         {/* Education */}
         <div data-parallax-speed="0.035" className="min-w-0">
         <RefractiveCard className={clsx(card, "flex flex-col bg-surface p-6")}>
@@ -57,7 +57,7 @@ export function SocialProof() {
         </RefractiveCard>
 
         {/* Stats: hover / focus reveals the stacked stats and "Core stack" pill */}
-        <div data-parallax-speed="-0.035" className="min-w-0">
+        <div data-parallax-speed="-0.035" className="min-w-0 max-xl:col-span-2 max-[767.98px]:col-span-1">
           <StatsCard />
         </div>
       </Reveal>

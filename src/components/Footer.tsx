@@ -36,11 +36,11 @@ const linkClass =
 
 export function Footer() {
   return (
-    <footer className="w-full rounded-none bg-transparent pt-24 text-white max-xl:pt-20">
+    <footer className="site-footer w-full rounded-none bg-transparent pt-24 text-white max-xl:pt-20">
       <div className="mx-auto w-[min(1120px,calc(100%-80px))] max-md:w-[calc(100%-40px)]">
         <nav
           aria-label="Footer navigation"
-          className="grid grid-cols-[max-content_max-content_max-content] items-start justify-center gap-x-[84px] max-xl:gap-x-14 max-md:grid-cols-1 max-md:justify-stretch max-md:gap-y-10"
+          className="grid grid-cols-[max-content_max-content_max-content] items-start justify-center gap-x-[84px] max-xl:gap-x-14 max-md:grid-cols-3 max-[639.98px]:grid-cols-2 max-md:justify-stretch max-md:gap-x-6 max-md:gap-y-8"
         >
           {COLUMNS.map((column, index) => (
             <Reveal key={column.title} delay={index * 0.08} y={18} className="min-w-28 max-[640.98px]:last:justify-self-start">

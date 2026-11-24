@@ -29,7 +29,7 @@ export function ThemeToggle({ className }: { className?: string }) {
       aria-label={dark ? "Switch to light theme" : "Switch to dark theme"}
       aria-pressed={dark}
       className={clsx(
-        "grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-fg transition-colors hover:bg-fg/[0.06] active:scale-95",
+        "grid h-11 w-11 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-fg transition-colors hover:bg-fg/[0.06] active:scale-95",
         className,
       )}
     >

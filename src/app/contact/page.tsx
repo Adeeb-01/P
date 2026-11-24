@@ -2,8 +2,23 @@ import type { Metadata } from "next";
 import { ContactForm } from "@/components/contact/ContactForm";
 import { ClosingSection } from "@/components/ClosingSection";
 
+const title = "Contact — Mohammad Adeeb Alsaleh";
+const description = "Contact Mohammad Adeeb Alsaleh to discuss software engineering roles, full-stack web and mobile projects, or AI and RAG integrations.";
+
 export const metadata: Metadata = {
-  title: "Contact — Mohammad Adeeb Alsaleh",
+  title,
+  description,
+  alternates: { canonical: "/contact" },
+  openGraph: {
+    title,
+    description,
+    url: "/contact",
+    type: "website",
+    siteName: "Mohammad Adeeb Alsaleh",
+    locale: "en_US",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Contact Mohammad Adeeb Alsaleh" }],
+  },
+  twitter: { card: "summary_large_image", title, description, images: ["/og-image.png"] },
 };
 
 export default function ContactPage() {

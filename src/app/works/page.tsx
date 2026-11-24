@@ -4,8 +4,23 @@ import { QuickJumpTrigger } from "@/components/works/ProjectQuickJump";
 import { SpatialShowcase } from "@/components/works/SpatialShowcase";
 import { PROJECTS } from "@/lib/projects";
 
+const title = "Works — Mohammad Adeeb Alsaleh";
+const description = "Explore Mohammad Adeeb Alsaleh's software engineering case studies: full-stack MERN and Next.js platforms, Flutter apps, and AI-powered RAG systems.";
+
 export const metadata: Metadata = {
-  title: "Works — Mohammad Adeeb Alsaleh",
+  title,
+  description,
+  alternates: { canonical: "/works" },
+  openGraph: {
+    title,
+    description,
+    url: "/works",
+    type: "website",
+    siteName: "Mohammad Adeeb Alsaleh",
+    locale: "en_US",
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Selected work by Mohammad Adeeb Alsaleh" }],
+  },
+  twitter: { card: "summary_large_image", title, description, images: ["/og-image.png"] },
 };
 
 export default function WorksPage() {

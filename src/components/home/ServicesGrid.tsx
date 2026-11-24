@@ -218,9 +218,9 @@ export function ServicesGrid({ services }: { services: Service[] }) {
 
   return (
     <>
-      <div className="grid grid-cols-3 items-stretch gap-3 max-xl:grid-cols-1">
+      <div className="grid grid-cols-3 items-stretch gap-4 max-xl:grid-cols-2 max-[767.98px]:grid-cols-1">
         {services.map((service, index) => (
-          <Reveal key={service.key} delay={index * 0.1} className="min-w-0">
+          <Reveal key={service.key} delay={index * 0.1} className="min-w-0 max-xl:last:col-span-2 max-[767.98px]:last:col-span-1">
             <ServiceCard
               service={service}
               hidden={openKey === service.key}

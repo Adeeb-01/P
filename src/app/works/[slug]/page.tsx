@@ -22,11 +22,34 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const { slug } = await params;
   const project = getProject(slug);
-  if (!project) return {};
+  if (!project) notFound();
+  const title = `${project.title} — Case Study — Mohammad Adeeb Alsaleh`;
+  const canonical = `/works/${project.slug}`;
+  const image = {
+    url: project.image.src,
+    width: project.image.width,
+    height: project.image.height,
+    alt: project.image.alt,
+  };
   return {
-    title: `${project.title} — Case Study — Mohammad Adeeb Alsaleh`,
+    title,
     description: project.caseStudy.summary,
-    openGraph: { title: `${project.title} — Case Study`, images: [{ url: project.image.src }] },
+    alternates: { canonical },
+    openGraph: {
+      title,
+      description: project.caseStudy.summary,
+      url: canonical,
+      type: "website",
+      siteName: "Mohammad Adeeb Alsaleh",
+      locale: "en_US",
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: project.caseStudy.summary,
+      images: [{ url: image.url, alt: image.alt }],
+    },
   };
 }
 

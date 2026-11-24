@@ -17,7 +17,7 @@ export function SoundToggle({ className }: { className?: string }) {
       aria-label={enabled ? "Turn interface sound off" : "Turn interface sound on"}
       data-sound="off"
       className={clsx(
-        "grid h-10 w-10 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-fg transition-colors hover:bg-fg/[0.06] active:scale-95",
+        "grid h-11 w-11 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-fg transition-colors hover:bg-fg/[0.06] active:scale-95",
         className,
       )}
     >

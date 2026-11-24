@@ -4,12 +4,13 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { m, useMotionValue, useMotionValueEvent, useScroll, useSpring, useTransform, type MotionValue } from "motion/react";
-import { usePointerEffects } from "@/components/motion/hooks";
+import { usePointerEffects, usePrefersReducedMotion } from "@/components/motion/hooks";
 import { ScrambleText } from "@/components/motion/ScrambleText";
 import { ThemeToggle } from "@/components/theme/ThemeToggle";
 import { SoundToggle } from "@/components/sound/SoundToggle";
 import { openQuickJump } from "@/components/works/ProjectQuickJump";
 import { useLenis } from "@/components/motion/SmoothScroll";
+import { useControlsHidden } from "./useControlsHidden";
 
 const TILE = 44; // resting tile size (px)
 const GAP = 6;
@@ -114,7 +115,10 @@ const LINKS = [
 export function SpatialDock() {
   const pathname = usePathname();
   const magnify = usePointerEffects();
+  const reduced = usePrefersReducedMotion();
   const dockRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
+  const controlsHidden = useControlsHidden(shellRef);
   const dockLeft = useRef(0);
   const pointer = useMotionValue(-1);
   const [centers, setCenters] = useState<number[]>([]);
@@ -169,10 +173,11 @@ export function SpatialDock() {
 
   return (
     <m.div
+      ref={shellRef}
       initial={false}
-      animate={shown ? { y: 0, opacity: 1 } : { y: 110, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 320, damping: 30 }}
-      inert={!shown}
+      animate={shown && !controlsHidden ? { y: 0, opacity: 1 } : { y: 110, opacity: 0 }}
+      transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 320, damping: 30 }}
+      inert={!shown || controlsHidden}
       className="fixed bottom-5 left-1/2 z-[55] -translate-x-1/2 max-md:hidden"
     >
       <div
@@ -218,7 +223,7 @@ export function SpatialDock() {
           <button
             type="button"
             aria-label="Back to top"
-            onClick={() => (lenis ? lenis.scrollTo(0, { duration: 1.4 }) : window.scrollTo({ top: 0, behavior: "smooth" }))}
+            onClick={() => (lenis && !reduced ? lenis.scrollTo(0, { duration: 1.4 }) : window.scrollTo({ top: 0, behavior: reduced ? "instant" : "smooth" }))}
             className="relative grid cursor-pointer place-items-center border-0 bg-transparent text-fg"
           >
             {/* Radial reading progress: stroke-dashoffset follows scrollYProgress. */}

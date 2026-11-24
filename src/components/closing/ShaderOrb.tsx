@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { m, useMotionValue, useSpring, useTransform } from "motion/react";
 import { ShaderObject } from "@/components/ShaderObject";
 import { useClosingStage } from "@/components/closing/ClosingStage";
-import { usePointerEffects } from "@/components/motion/hooks";
+import { usePrefersReducedMotion } from "@/components/motion/hooks";
 import type { RefObject } from "react";
 import type { ShaderParams } from "@/lib/shader-params";
 
@@ -18,7 +18,7 @@ const SPRING = { stiffness: 120, damping: 16, mass: 0.6 };
  */
 export function ShaderOrb({ className, params }: { className?: string; params?: RefObject<ShaderParams | null> }) {
   const stage = useClosingStage();
-  const enabled = usePointerEffects();
+  const enabled = !usePrefersReducedMotion();
   const nx = useMotionValue(0);
   const ny = useMotionValue(0);
   const rotateY = useSpring(useTransform(nx, [-1, 1], [-TILT, TILT]), SPRING);
@@ -44,6 +44,9 @@ export function ShaderOrb({ className, params }: { className?: string; params?: 
       ny.set(0);
     };
     element.addEventListener("pointermove", onMove);
+    element.addEventListener("pointerdown", onMove);
+    element.addEventListener("pointerup", onLeave);
+    element.addEventListener("pointercancel", onLeave);
     element.addEventListener("pointerleave", onLeave);
     window.addEventListener("scroll", invalidate, { passive: true });
     window.addEventListener("resize", invalidate);
@@ -51,6 +54,9 @@ export function ShaderOrb({ className, params }: { className?: string; params?: 
       window.removeEventListener("scroll", invalidate);
       window.removeEventListener("resize", invalidate);
       element.removeEventListener("pointermove", onMove);
+      element.removeEventListener("pointerdown", onMove);
+      element.removeEventListener("pointerup", onLeave);
+      element.removeEventListener("pointercancel", onLeave);
       element.removeEventListener("pointerleave", onLeave);
     };
   }, [stage, enabled, nx, ny]);
@@ -64,7 +70,7 @@ export function ShaderOrb({ className, params }: { className?: string; params?: 
       >
         <m.div
           className="h-full w-full rounded-full bg-[radial-gradient(closest-side,rgba(116,48,247,0.45),rgba(116,48,247,0.12)_55%,transparent)]"
-          animate={{ scale: [0.92, 1.08, 0.92], opacity: [0.7, 1, 0.7] }}
+          animate={enabled ? { scale: [0.92, 1.08, 0.92], opacity: [0.7, 1, 0.7] } : { scale: 1, opacity: 0.7 }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
       </m.div>

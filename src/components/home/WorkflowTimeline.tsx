@@ -3,10 +3,12 @@
 import { useRef } from "react";
 import { m, useScroll, useSpring, useTransform } from "motion/react";
 import { useRefraction } from "@/components/motion/RefractiveCard";
+import { usePrefersReducedMotion } from "@/components/motion/hooks";
 
 export type WorkflowStep = { key: string; title: string; description: string };
 
 function StepCard({ step, index }: { step: WorkflowStep; index: number }) {
+  const reduced = usePrefersReducedMotion();
   const ref = useRef<HTMLElement>(null);
   // 0 → 1 as the card travels from the lower part of the viewport to just above centre.
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start 85%", "start 45%"] });
@@ -18,7 +20,7 @@ function StepCard({ step, index }: { step: WorkflowStep; index: number }) {
   return (
     <m.article
       ref={ref}
-      style={{ opacity: cardOpacity, y: cardY }}
+      style={reduced ? { opacity: 1, y: 0 } : { opacity: cardOpacity, y: cardY }}
       onPointerMove={refraction.onPointerMove}
       onPointerLeave={refraction.onPointerLeave}
       className={`${refraction.rootClass} relative col-start-1 min-h-[226px] min-w-0 rounded-3xl border border-graphite bg-ink p-6 shadow-none hover-fine:transition-[border-color] hover-fine:duration-300 hover-fine:ease-out hover-fine:hover:border-[rgb(42,42,42)] xl:min-h-[236px] xl:w-[488px] xl:flex-none xl:bg-[rgb(20,20,20)] xl:p-[30px] ${index % 2 === 0 ? "xl:ml-[40%]" : "xl:ml-[59%]"}`}

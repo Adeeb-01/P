@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { m, useScroll, useTransform, type Variants } from "motion/react";
 import clsx from "clsx";
 import { useClosingStage } from "@/components/closing/ClosingStage";
+import { usePrefersReducedMotion } from "@/components/motion/hooks";
 import { ProximityChar, ProximityProvider, useProximityField } from "@/components/motion/ProximityText";
 
 const NAME = "Adeeb Alsaleh";
@@ -32,6 +33,7 @@ const GRADIENT = "bg-[linear-gradient(180deg,rgba(255,255,255,0.92)_0%,rgba(255,
  * in the closing section (lift / scale / tilt via springs — transforms only, no layout shift).
  */
 export function FooterWordmark() {
+  const reduced = usePrefersReducedMotion();
   const ref = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLParagraphElement>(null);
   const stage = useClosingStage();
@@ -43,12 +45,12 @@ export function FooterWordmark() {
 
   return (
     <div ref={ref} aria-hidden="true" className="pointer-events-none mt-16 w-full select-none max-md:mt-12">
-      <m.div style={{ y }}>
+      <m.div style={{ y: reduced ? 0 : y }}>
         <ProximityProvider field={field}>
           <m.p
             ref={textRef}
             variants={container}
-            initial="hidden"
+            initial={reduced ? false : "hidden"}
             whileInView="show"
             viewport={{ once: true, margin: "0px 0px -5% 0px" }}
             onAnimationComplete={() => setRevealed(true)}

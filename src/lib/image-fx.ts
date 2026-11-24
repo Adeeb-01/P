@@ -38,7 +38,7 @@ void main(){
 
 const MAX_TEXTURE_WIDTH = 1280;
 
-type TextureEntry = { texture: WebGLTexture; aspect: number };
+type TextureEntry = { texture: WebGLTexture; aspect: number; owner: WebGLRenderingContext };
 
 export type FrameParams = {
   width: number;
@@ -126,7 +126,7 @@ class ImageFx {
           resizeQuality: "high",
         });
         probe.close();
-        if (!this.gl) return null;
+        if (this.gl !== gl || gl.isContextLost()) { bitmap.close(); return null; }
         const texture = gl.createTexture()!;
         gl.bindTexture(gl.TEXTURE_2D, texture);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -134,7 +134,7 @@ class ImageFx {
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
         gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, bitmap);
-        const entry = { texture, aspect: bitmap.width / bitmap.height };
+        const entry = { texture, aspect: bitmap.width / bitmap.height, owner: gl };
         bitmap.close();
         return entry;
       } catch {
@@ -152,7 +152,7 @@ class ImageFx {
   draw(target: CanvasRenderingContext2D, entry: TextureEntry, params: FrameParams) {
     const gl = this.gl;
     const canvas = this.canvas;
-    if (!gl || !canvas) return false;
+    if (!gl || !canvas || gl.isContextLost() || entry.owner !== gl) return false;
     const { width, height } = params;
     // Grow-only backing store: avoids reallocating as different cards render.
     if (canvas.width < width || canvas.height < height) {
